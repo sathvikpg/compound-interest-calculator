@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Compound Interest Calculator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .calculator-container {
+            max-width: 700px; 
+            margin: 2rem auto;
+            padding: 2rem;
+            background-color: #ffffff;
+            border-radius: 0.75rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .input-group {
+            margin-bottom: 1.5rem;
+        }
+        .input-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: #374151; 
+        }
+        .input-field, .select-field {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #D1D5DB; 
+            border-radius: 0.375rem; 
+            box-shadow: inset 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+            background-color: white;
+        }
+        .input-field:focus, .select-field:focus {
+            outline: none;
+            border-color: #6366F1; 
+            box-shadow: 0 0 0 0.2rem rgba(99, 102, 241, 0.25);
+        }
+        .main-button-container { 
+            display: flex;
+            gap: 0.75rem; 
+            margin-top: 1.5rem; 
+        }
+        .calculate-button, .reset-button { 
+            flex-grow: 1; 
+            padding: 0.75rem 1rem; 
+            color: white;
+            font-weight: 600;
+            border-radius: 0.375rem; 
+            transition: background-color 0.15s ease-in-out;
+            cursor: pointer;
+            font-size: 0.875rem; 
+            text-align: center;
+        }
+        .calculate-button {
+            background-color: #6366F1; 
+        }
+        .calculate-button:hover {
+            background-color: #4F46E5; 
+        }
+        .reset-button {
+            background-color: #6B7280; 
+        }
+        .reset-button:hover {
+            background-color: #4B5563; 
+        }
+        
+        .toggle-breakdown-button { 
+            width: 100%; 
+            margin-top: 1rem; 
+            padding: 0.75rem 1rem; 
+            color: white;
+            font-weight: 600;
+            border-radius: 0.375rem; 
+            transition: background-color 0.15s ease-in-out;
+            cursor: pointer;
+            font-size: 0.875rem; 
+            text-align: center;
+            background-color: #F59E0B; 
+            display: none; 
+        }
+        .toggle-breakdown-button:hover {
+            background-color: #D97706; 
+        }
+
+        .results-container {
+            margin-top: 2rem;
+            padding: 1.5rem;
+            background-color: #F3F4F6; 
+            border-radius: 0.375rem; 
+        }
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.75rem;
+            font-size: 1rem;
+        }
+        .result-label {
+            font-weight: 500;
+            color: #4B5563; 
+        }
+        .result-value {
+            font-weight: 600;
+            color: #1F2937; 
+        }
+        .result-value.positive { 
+            color: #004225; 
+        }
+        .result-value.negative { color: #DC2626; } 
+        .result-value.light-positive { color: #22C55E; } 
+        .result-value.light-negative { color: #F87171; }
+
+        .message-box {
+            margin-top: 1rem; padding: 0.75rem 1rem; border-radius: 0.375rem;
+            font-size: 0.875rem; text-align: center;
+        }
+        .message-box-error { background-color: #FEE2E2; color: #B91C1C; border: 1px solid #FCA5A5; }
+        .message-box-success { background-color: #D1FAE5; color: #065F46; border: 1px solid #6EE7B7; }
+        
+        .contribution-tabs { display: flex; gap: 0.5rem; margin-bottom: 1rem; }
+        .contribution-tabs input[type="radio"] { display: none; }
+        .contribution-tabs label {
+            flex-grow: 1; text-align: center; padding: 0.625rem 0.5rem; font-size: 0.875rem; 
+            font-weight: 500; color: #4B5563; background-color: #F3F4F6; 
+            border: 1px solid #D1D5DB; border-radius: 0.375rem; cursor: pointer;
+            transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out, border-color 0.2s ease-in-out;
+            white-space: nowrap; 
+        }
+        .contribution-tabs label:hover { background-color: #E5E7EB; }
+        .contribution-tabs input[type="radio"]:checked + label { background-color: #6366F1; color: white; border-color: #4F46E5; }
+        .contribution-tabs input[type="radio"]#contribDeposits:checked + label { background-color: #16A34A; color: white; border-color: #15803D; }
+        .contribution-tabs input[type="radio"]#contribWithdrawals:checked + label { background-color: #DC2626; color: white; border-color: #B91C1C; }
+        
+        .optional-fields-section { margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid #E5E7EB;}
+        .optional-fields-section h3 { font-size: 1.125rem; font-weight: 600; color: #374151; margin-bottom: 1rem; }
+        .grid-2-col { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; }
+
+        .breakdown-section {
+            margin-top: 2rem; padding: 1.5rem; background-color: #F9FAFB; 
+            border: 1px solid #E5E7EB; border-radius: 0.375rem;
+        }
+        .breakdown-controls {
+            display: flex; gap: 0.5rem; margin-bottom: 1rem; justify-content: center;
+        }
+        .breakdown-controls button {
+            padding: 0.5rem 1rem; font-size: 0.875rem; font-weight: 500;
+            border-radius: 0.375rem; cursor: pointer; transition: background-color 0.2s, color 0.2s;
+            background-color: #E5E7EB; color: #374151; border: 1px solid #D1D5DB; 
+        }
+        .breakdown-controls button.active {
+            background-color: #4F46E5; color: white; border-color: #4338CA; 
+        }
+        .breakdown-table-container { max-height: 400px; overflow-y: auto; }
+        .breakdown-table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
+        .breakdown-table th, .breakdown-table td {
+            border: 1px solid #D1D5DB; padding: 0.5rem; text-align: right;
+        }
+        .breakdown-table th {
+            background-color: #E5E7EB; font-weight: 600; position: sticky; top: 0; z-index: 10;
+        }
+        .breakdown-table td {
+            font-weight: 500; 
+        }
+        .breakdown-table td:first-child, .breakdown-table th:first-child { text-align: left; }
+        .breakdown-table td.positive { color: #004225; } 
+        .breakdown-table td.negative { color: #DC2626; }
+        .breakdown-table tr.last-row-highlight td {
+            background-color: #E0E7FF; 
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+
+    <div class="calculator-container">
+        <h1 class="text-2xl font-bold text-center text-gray-800 mb-8">Compound Interest Calculator</h1>
+
+        <!-- Currency Selector -->
+        <div class="input-group">
+            <label for="currency" class="input-label">Currency</label>
+            <select id="currency" class="select-field">
+                <option value="$" data-label="USD ($)">US Dollar ($)</option>
+                <option value="€" data-label="EUR (€)">Euro (€)</option>
+                <option value="¥" data-label="JPY (¥)">Japanese Yen (¥)</option>
+                <option value="£" data-label="GBP (£)">British Pound (£)</option>
+                <option value="A$" data-label="AUD (A$)">Australian Dollar (A$)</option>
+                <option value="C$" data-label="CAD (C$)">Canadian Dollar (C$)</option>
+                <option value="Fr" data-label="CHF (Fr)">Swiss Franc (Fr)</option>
+                <option value="₹" data-label="INR (₹)">Indian Rupee (₹)</option>
+                <option value="R$" data-label="BRL (R$)">Brazilian Real (R$)</option>
+                <option value="₽" data-label="RUB (₽)">Russian Ruble (₽)</option>
+                <option value="元" data-label="CNY (元)">Chinese Yuan (元)</option>
+                <option value="₩" data-label="KRW (₩)">South Korean Won (₩)</option>
+            </select>
+        </div>
+
+        <!-- Input Form -->
+        <div class="input-group">
+            <label for="principal" class="input-label">Principal Amount (<span id="principalCurrencyLabel">$</span>)</label>
+            <input type="number" id="principal" class="input-field" placeholder="e.g., 10000">
+        </div>
+
+        <div class="input-group">
+            <label for="rate" class="input-label">Annual Interest Rate (%)</label>
+            <input type="number" id="rate" class="input-field" placeholder="e.g., 5">
+        </div>
+
+        <div class="input-group">
+            <label for="frequency" class="input-label">Main Compounding Frequency</label>
+            <select id="frequency" class="select-field">
+                <option value="365">Daily</option>
+                <option value="52">Weekly</option>
+                <option value="12" selected>Monthly</option>
+                <option value="4">Quarterly</option>
+                <option value="2">Semi-Annually</option>
+                <option value="1">Annually</option>
+            </select>
+        </div>
+
+        <div class="input-group">
+            <label for="time" class="input-label">Time Period (Years)</label>
+            <input type="number" id="time" class="input-field" placeholder="e.g., 10">
+        </div>
+
+        <!-- Additional Contributions -->
+        <div class="input-group">
+            <label class="input-label">Additional Contributions/Withdrawals</label>
+            <div class="contribution-tabs" id="contributionTabs">
+                <input type="radio" name="contributionType" value="none" id="contribNone" checked>
+                <label for="contribNone">None</label>
+
+                <input type="radio" name="contributionType" value="deposits" id="contribDeposits">
+                <label for="contribDeposits">Deposits Only</label>
+
+                <input type="radio" name="contributionType" value="withdrawals" id="contribWithdrawals">
+                <label for="contribWithdrawals">Withdrawals Only</label>
+
+                <input type="radio" name="contributionType" value="both" id="contribBoth">
+                <label for="contribBoth">Both</label>
+            </div>
+        </div>
+
+        <!-- Deposit Fields Section -->
+        <div id="depositFieldsSection" class="optional-fields-section" style="display: none;">
+            <h3>Periodic Deposits</h3>
+            <div class="grid-2-col">
+                <div class="input-group">
+                    <label for="depositAmount" class="input-label">Deposit Amount</label>
+                    <input type="number" id="depositAmount" class="input-field" placeholder="e.g., 100">
+                </div>
+                <div class="input-group">
+                    <label for="depositFrequency" class="input-label">Deposit Frequency</label>
+                    <select id="depositFrequency" class="select-field">
+                        <option value="365">Daily</option>
+                        <option value="52">Weekly</option>
+                        <option value="12" selected>Monthly</option>
+                        <option value="4">Quarterly</option>
+                        <option value="2">Semi-Annually</option>
+                        <option value="1">Annually</option>
+                    </select>
+                </div>
+            </div>
+            <div class="input-group">
+                <label for="annualDepositIncrease" class="input-label">Annual Deposit Increase (%) (Optional)</label>
+                <input type="number" id="annualDepositIncrease" class="input-field" placeholder="e.g., 2">
+            </div>
+        </div>
+
+        <!-- Withdrawal Fields Section -->
+        <div id="withdrawalFieldsSection" class="optional-fields-section" style="display: none;">
+            <h3>Periodic Withdrawals</h3>
+            <div class="grid-2-col">
+                <div class="input-group">
+                    <label for="withdrawalAmount" class="input-label">Withdrawal Amount</label>
+                    <input type="number" id="withdrawalAmount" class="input-field" placeholder="e.g., 50">
+                </div>
+                <div class="input-group">
+                    <label for="withdrawalFrequency" class="input-label">Withdrawal Frequency</label>
+                    <select id="withdrawalFrequency" class="select-field">
+                        <option value="365">Daily</option>
+                        <option value="52">Weekly</option>
+                        <option value="12" selected>Monthly</option>
+                        <option value="4">Quarterly</option>
+                        <option value="2">Semi-Annually</option>
+                        <option value="1">Annually</option>
+                    </select>
+                </div>
+            </div>
+            <div class="input-group">
+                <label for="annualWithdrawalIncrease" class="input-label">Annual Withdrawal Increase (%) (Optional)</label>
+                <input type="number" id="annualWithdrawalIncrease" class="input-field" placeholder="e.g., 1">
+            </div>
+        </div>
+
+        <!-- Buttons: Calculate and Reset -->
+        <div class="main-button-container">
+            <button id="calculateBtn" class="calculate-button">Calculate</button>
+            <button id="resetBtn" class="reset-button">Reset</button>
+        </div>
+
+
+        <!-- Message Box for errors or info -->
+        <div id="messageBox" class="message-box" style="display: none;"></div>
+
+        <!-- Results Display -->
+        <div id="results" class="results-container" style="display: none;">
+            <h2 class="text-xl font-semibold text-gray-700 mb-4 text-center">Results</h2>
+            <div class="result-item">
+                <span class="result-label">Principal Amount:</span>
+                <span id="resultPrincipal" class="result-value"></span>
+            </div>
+            <div id="resultTotalDepositsRow" class="result-item" style="display: none;">
+                <span class="result-label">Total Deposits Made:</span>
+                <span id="resultTotalDeposits" class="result-value"></span>
+            </div>
+            <div id="resultTotalWithdrawalsRow" class="result-item" style="display: none;">
+                <span class="result-label">Total Withdrawals Made:</span>
+                <span id="resultTotalWithdrawals" class="result-value"></span>
+            </div>
+            <div class="result-item">
+                <span class="result-label">Total Interest Earned:</span>
+                <span id="resultInterest" class="result-value"></span>
+            </div>
+            <hr class="my-2 border-gray-300">
+            <div class="result-item">
+                <span class="result-label text-lg">Future Value:</span>
+                <span id="resultTotal" class="result-value text-lg"></span>
+            </div>
+            <button id="toggleBreakdownBtn" class="toggle-breakdown-button">Show Breakdown</button>
+        </div>
+
+        <!-- Breakdown Section -->
+        <div id="breakdownSection" class="breakdown-section" style="display: none;">
+            <h3 class="text-xl font-semibold text-gray-700 mb-4 text-center">Calculation Breakdown</h3>
+            <div class="breakdown-controls">
+                <button id="viewMonthlyBreakdownBtn" class="active">View Monthly</button>
+                <button id="viewYearlyBreakdownBtn">View Yearly</button>
+            </div>
+            <div class="breakdown-table-container">
+                <table id="breakdownTable" class="breakdown-table">
+                    <thead>
+                        <tr>
+                            <th>Period</th>
+                            <th>Start Balance</th>
+                            <th>Deposits</th>
+                            <th>Withdrawals</th>
+                            <th>Interest</th>
+                            <th>End Balance</th>
+                        </tr>
+                    </thead>
+                    <tbody id="breakdownTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+
+    </div> 
+
+    <script>
+        // DOM Elements
+        const currencySelect = document.getElementById('currency');
+        const principalInput = document.getElementById('principal');
+        const principalCurrencyLabel = document.getElementById('principalCurrencyLabel');
+        const rateInput = document.getElementById('rate');
+        const frequencyInput = document.getElementById('frequency');
+        const timeInput = document.getElementById('time');
+        const calculateBtn = document.getElementById('calculateBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const toggleBreakdownBtn = document.getElementById('toggleBreakdownBtn'); 
+        const resultsDiv = document.getElementById('results');
+        const resultPrincipalSpan = document.getElementById('resultPrincipal');
+        const resultInterestSpan = document.getElementById('resultInterest');
+        const resultTotalSpan = document.getElementById('resultTotal');
+        const messageBox = document.getElementById('messageBox');
+        const contributionTabsContainer = document.getElementById('contributionTabs'); 
+        const contribNoneRadio = document.getElementById('contribNone'); 
+        const depositFieldsSection = document.getElementById('depositFieldsSection');
+        const depositAmountInput = document.getElementById('depositAmount');
+        const depositFrequencySelect = document.getElementById('depositFrequency');
+        const annualDepositIncreaseInput = document.getElementById('annualDepositIncrease');
+        const resultTotalDepositsRow = document.getElementById('resultTotalDepositsRow');
+        const resultTotalDepositsSpan = document.getElementById('resultTotalDeposits');
+        const withdrawalFieldsSection = document.getElementById('withdrawalFieldsSection');
+        const withdrawalAmountInput = document.getElementById('withdrawalAmount');
+        const withdrawalFrequencySelect = document.getElementById('withdrawalFrequency');
+        const annualWithdrawalIncreaseInput = document.getElementById('annualWithdrawalIncrease');
+        const resultTotalWithdrawalsRow = document.getElementById('resultTotalWithdrawalsRow');
+        const resultTotalWithdrawalsSpan = document.getElementById('resultTotalWithdrawals');
+        const breakdownSection = document.getElementById('breakdownSection'); 
+        const viewMonthlyBreakdownBtn = document.getElementById('viewMonthlyBreakdownBtn'); 
+        const viewYearlyBreakdownBtn = document.getElementById('viewYearlyBreakdownBtn'); 
+        const breakdownTableBody = document.getElementById('breakdownTableBody'); 
+
+        let detailedBreakdownData = []; 
+        let currentBreakdownView = 'monthly'; 
+
+        // Event Listeners
+        currencySelect.addEventListener('change', (event) => {
+            principalCurrencyLabel.textContent = event.target.value;
+            clearResultsAndMessages(); 
+        });
+
+        contributionTabsContainer.addEventListener('click', (event) => {
+            if (event.target.tagName === 'LABEL') {
+                const radioId = event.target.getAttribute('for');
+                const radioInput = document.getElementById(radioId);
+                if (radioInput) {
+                    updateContributionSections(radioInput.value);
+                }
+            }
+        });
+        
+        toggleBreakdownBtn.addEventListener('click', () => {
+            const isHidden = breakdownSection.style.display === 'none' || breakdownSection.style.display === '';
+            if (isHidden) {
+                if (detailedBreakdownData.length > 0) {
+                    breakdownSection.style.display = 'block';
+                    toggleBreakdownBtn.textContent = 'Hide Breakdown';
+                    renderBreakdownTable(currentBreakdownView); 
+                } else {
+                    showMessage('Calculate first to see the breakdown.', 'info');
+                }
+            } else {
+                breakdownSection.style.display = 'none';
+                toggleBreakdownBtn.textContent = 'Show Breakdown';
+            }
+        });
+        
+        viewMonthlyBreakdownBtn.addEventListener('click', () => {
+            currentBreakdownView = 'monthly';
+            viewMonthlyBreakdownBtn.classList.add('active');
+            viewYearlyBreakdownBtn.classList.remove('active');
+            renderBreakdownTable(currentBreakdownView);
+        });
+        viewYearlyBreakdownBtn.addEventListener('click', () => {
+            currentBreakdownView = 'yearly';
+            viewYearlyBreakdownBtn.classList.add('active');
+            viewMonthlyBreakdownBtn.classList.remove('active');
+            renderBreakdownTable(currentBreakdownView);
+        });
+
+        resetBtn.addEventListener('click', resetCalculator);
+        calculateBtn.addEventListener('click', performCalculation);
+
+        const allInputs = [ 
+            principalInput, rateInput, frequencyInput, timeInput, 
+            depositAmountInput, depositFrequencySelect, annualDepositIncreaseInput,
+            withdrawalAmountInput, withdrawalFrequencySelect, annualWithdrawalIncreaseInput,
+            currencySelect 
+        ];
+        allInputs.forEach(input => { 
+            if (input) { 
+                input.addEventListener('input', clearResultsAndMessages);
+                if (input.tagName === 'SELECT') { input.addEventListener('change', clearResultsAndMessages); }
+            }
+        });
+        
+        // Initial Setup
+        const initiallyCheckedRadio = document.querySelector('input[name="contributionType"]:checked');
+        if (initiallyCheckedRadio) { updateContributionSections(initiallyCheckedRadio.value); }
+        principalCurrencyLabel.textContent = currencySelect.value;
+
+
+        // Functions
+        function updateContributionSections(type) {
+            depositFieldsSection.style.display = (type === 'deposits' || type === 'both') ? 'block' : 'none';
+            withdrawalFieldsSection.style.display = (type === 'withdrawals' || type === 'both') ? 'block' : 'none';
+            
+            // Reset specific fields when their section is hidden
+            if (type !== 'deposits' && type !== 'both') {
+                 depositAmountInput.value = ''; 
+                 annualDepositIncreaseInput.value = ''; 
+                 depositFrequencySelect.value = "12"; // Default
+            }
+            if (type !== 'withdrawals' && type !== 'both') { 
+                withdrawalAmountInput.value = ''; 
+                annualWithdrawalIncreaseInput.value = ''; 
+                withdrawalFrequencySelect.value = "12"; // Default
+            }
+            clearResultsAndMessages();
+        }
+        
+        function resetCalculator() {
+            principalInput.value = ''; rateInput.value = ''; timeInput.value = '';
+            currencySelect.value = '$'; principalCurrencyLabel.textContent = '$';
+            frequencyInput.value = '12';
+            if (contribNoneRadio) { contribNoneRadio.checked = true; }
+            updateContributionSections('none'); 
+            
+            detailedBreakdownData = []; 
+            breakdownSection.style.display = 'none'; 
+            toggleBreakdownBtn.style.display = 'none'; 
+            toggleBreakdownBtn.textContent = 'Show Breakdown';
+            currentBreakdownView = 'monthly'; 
+            viewMonthlyBreakdownBtn.classList.add('active');
+            viewYearlyBreakdownBtn.classList.remove('active');
+            showMessage('Calculator has been reset.', 'info');
+        }
+
+        function performCalculation() {
+            clearResultsAndMessages(); 
+            detailedBreakdownData = []; 
+
+            const principal = parseFloat(principalInput.value);
+            const annualRateDecimal = parseFloat(rateInput.value) / 100;
+            const mainCompoundingFreqPerYear = parseInt(frequencyInput.value);
+            const timeYears = parseFloat(timeInput.value);
+            const selectedCurrency = currencySelect.value;
+            const contributionChoice = document.querySelector('input[name="contributionType"]:checked').value;
+            
+            if (isNaN(principal) || principal < 0) { showMessage('Please enter a valid principal amount.', 'error'); principalInput.focus(); return; }
+            if (isNaN(annualRateDecimal) || annualRateDecimal <= 0) { showMessage('Please enter a valid annual interest rate.', 'error'); rateInput.focus(); return; }
+            if (isNaN(mainCompoundingFreqPerYear) || mainCompoundingFreqPerYear <= 0) { showMessage('Please select a valid main compounding frequency.', 'error'); frequencyInput.focus(); return; }
+            if (isNaN(timeYears) || timeYears <= 0) { showMessage('Please enter a valid time period in years.', 'error'); timeInput.focus(); return; }
+
+            let futureValue = 0; let totalInterestEarned = 0;
+            let totalDepositsMade = 0; let totalWithdrawalsMade = 0;
+
+            let depositAmountPerOccurrence = 0, depositFreqPeriodsPerYear = 0, annualDepositIncreaseDecimal = 0;
+            let withdrawalAmountPerOccurrence = 0, withdrawalFreqPeriodsPerYear = 0, annualWithdrawalIncreaseDecimal = 0;
+
+            if (contributionChoice === 'deposits' || contributionChoice === 'both') {  
+                depositAmountPerOccurrence = parseFloat(depositAmountInput.value) || 0; // Default to 0 if NaN
+                depositFreqPeriodsPerYear = parseInt(depositFrequencySelect.value);
+                annualDepositIncreaseDecimal = (parseFloat(annualDepositIncreaseInput.value) || 0) / 100;
+                if (depositAmountPerOccurrence < 0) { showMessage('Deposit amount cannot be negative.', 'error'); return; }
+                if (isNaN(depositFreqPeriodsPerYear) || depositFreqPeriodsPerYear <= 0) { showMessage('Valid deposit frequency needed.', 'error'); return; }
+                if (isNaN(annualDepositIncreaseDecimal) || annualDepositIncreaseDecimal < 0) { showMessage('Deposit increase must be non-negative.', 'error'); return;}
+            }
+            if (contributionChoice === 'withdrawals' || contributionChoice === 'both') { 
+                withdrawalAmountPerOccurrence = parseFloat(withdrawalAmountInput.value) || 0; // Default to 0 if NaN
+                withdrawalFreqPeriodsPerYear = parseInt(withdrawalFrequencySelect.value);
+                annualWithdrawalIncreaseDecimal = (parseFloat(annualWithdrawalIncreaseInput.value) || 0) / 100;
+                if (withdrawalAmountPerOccurrence < 0) { showMessage('Withdrawal amount cannot be negative.', 'error'); return; }
+                if (isNaN(withdrawalFreqPeriodsPerYear) || withdrawalFreqPeriodsPerYear <= 0) { showMessage('Valid withdrawal frequency needed.', 'error'); return; }
+                if (isNaN(annualWithdrawalIncreaseDecimal) || annualWithdrawalIncreaseDecimal < 0) { showMessage('Withdrawal increase must be non-negative.', 'error'); return;}
+            }
+
+            if (contributionChoice === 'none') {
+                const ratePerPeriod = annualRateDecimal / mainCompoundingFreqPerYear;
+                const numPeriodsTotal = mainCompoundingFreqPerYear * timeYears;
+                let currentLoopBalance = principal;
+
+                for (let period = 1; period <= numPeriodsTotal; period++) {
+                    const interestThisPeriod = currentLoopBalance * ratePerPeriod;
+                    const startBal = currentLoopBalance;
+                    currentLoopBalance += interestThisPeriod;
+                    
+                    // For 'none', generate breakdown based on compounding periods.
+                    // This logic is simplified for very frequent compounding (e.g. daily) when showing monthly breakdown.
+                    // A more precise monthly breakdown for daily compounding in 'none' mode would require daily iteration.
+                    detailedBreakdownData.push({
+                        periodType: 'Period', 
+                        periodNumber: period, 
+                        year: Math.ceil(period / mainCompoundingFreqPerYear),
+                        startingBalance: startBal,
+                        depositsThisPeriod: 0,
+                        withdrawalsThisPeriod: 0,
+                        interestEarnedThisPeriod: interestThisPeriod,
+                        endingBalance: currentLoopBalance
+                    });
+                }
+                futureValue = currentLoopBalance;
+                totalInterestEarned = futureValue - principal;
+
+            } else { 
+                let currentBalance = principal;
+                let currentActualPeriodicDeposit = depositAmountPerOccurrence;
+                let currentActualPeriodicWithdrawal = withdrawalAmountPerOccurrence;
+                const totalMonthsToSimulate = Math.round(timeYears * 12);
+
+                for (let month = 1; month <= totalMonthsToSimulate; month++) {
+                    const startingBalanceThisMonth = currentBalance;
+                    let depositsThisMonthTotal = 0; // Total deposits in this specific month
+                    let withdrawalsThisMonthTotal = 0; // Total withdrawals in this specific month
+
+                    if (month > 1 && (month - 1) % 12 === 0) { 
+                        if (contributionChoice === 'deposits' || contributionChoice === 'both') { if(annualDepositIncreaseDecimal > 0) currentActualPeriodicDeposit *= (1 + annualDepositIncreaseDecimal); }
+                        if (contributionChoice === 'withdrawals' || contributionChoice === 'both') { if(annualWithdrawalIncreaseDecimal > 0) currentActualPeriodicWithdrawal *= (1 + annualWithdrawalIncreaseDecimal); }
+                    }
+                    
+                    // Calculate total deposits for the current month
+                    if ((contributionChoice === 'deposits' || contributionChoice === 'both') && depositFreqPeriodsPerYear > 0 && currentActualPeriodicDeposit > 0) {
+                        if (depositFreqPeriodsPerYear === 365) { // Daily
+                            depositsThisMonthTotal = currentActualPeriodicDeposit * (365 / 12); // Average days
+                        } else if (depositFreqPeriodsPerYear === 52) { // Weekly
+                            depositsThisMonthTotal = currentActualPeriodicDeposit * (52 / 12); // Average weeks
+                        } else { // Monthly, Quarterly, Semi-Annually, Annually
+                            const depositIntervalMonths = 12 / depositFreqPeriodsPerYear;
+                            if (month % depositIntervalMonths === 0) {
+                                depositsThisMonthTotal = currentActualPeriodicDeposit;
+                            }
+                        }
+                        currentBalance += depositsThisMonthTotal;
+                        totalDepositsMade += depositsThisMonthTotal;
+                    }
+
+                    // Calculate total withdrawals for the current month
+                    if ((contributionChoice === 'withdrawals' || contributionChoice === 'both') && withdrawalFreqPeriodsPerYear > 0 && currentActualPeriodicWithdrawal > 0) {
+                        let actualWithdrawalThisMonth = 0;
+                        if (withdrawalFreqPeriodsPerYear === 365) { // Daily
+                            actualWithdrawalThisMonth = currentActualPeriodicWithdrawal * (365 / 12);
+                        } else if (withdrawalFreqPeriodsPerYear === 52) { // Weekly
+                            actualWithdrawalThisMonth = currentActualPeriodicWithdrawal * (52 / 12);
+                        } else { // Monthly, Quarterly, Semi-Annually, Annually
+                            const withdrawalIntervalMonths = 12 / withdrawalFreqPeriodsPerYear;
+                            if (month % withdrawalIntervalMonths === 0) {
+                                actualWithdrawalThisMonth = currentActualPeriodicWithdrawal;
+                            }
+                        }
+                        const amountToWithdraw = Math.min(currentBalance, actualWithdrawalThisMonth);
+                        currentBalance -= amountToWithdraw;
+                        totalWithdrawalsMade += amountToWithdraw;
+                        withdrawalsThisMonthTotal = amountToWithdraw;
+                    }
+                    
+                    const balanceBeforeInterest = currentBalance;
+                    const monthlyGrowthFactor = Math.pow(1 + (annualRateDecimal / mainCompoundingFreqPerYear), mainCompoundingFreqPerYear / 12.0);
+                    let interestThisMonth = 0;
+                    if (currentBalance > 0) { 
+                        currentBalance *= monthlyGrowthFactor;
+                        interestThisMonth = currentBalance - balanceBeforeInterest;
+                    }
+                    
+                    detailedBreakdownData.push({
+                        periodType: 'Month',
+                        periodNumber: month,
+                        year: Math.ceil(month / 12),
+                        startingBalance: startingBalanceThisMonth,
+                        depositsThisPeriod: depositsThisMonthTotal,
+                        withdrawalsThisPeriod: withdrawalsThisMonthTotal,
+                        interestEarnedThisPeriod: interestThisMonth,
+                        endingBalance: currentBalance
+                    });
+                }
+                futureValue = currentBalance;
+                totalInterestEarned = futureValue - principal - totalDepositsMade + totalWithdrawalsMade;
+            }
+
+            // Display Results
+            const formatCurrency = (value) => { 
+                if (selectedCurrency === '¥' || selectedCurrency === '₩') { return `${selectedCurrency}${Math.round(value).toLocaleString()}`; }
+                const fixedValue = value.toFixed(2); const parts = fixedValue.split('.');
+                parts[0] = parseFloat(parts[0]).toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0});
+                return `${selectedCurrency}${parts.join('.')}`;
+            };
+
+            resultPrincipalSpan.textContent = formatCurrency(principal);
+            resultTotalDepositsRow.style.display = (contributionChoice === 'deposits' || contributionChoice === 'both') && totalDepositsMade > 0 ? 'flex' : 'none';
+            resultTotalDepositsSpan.textContent = formatCurrency(totalDepositsMade);
+            resultTotalWithdrawalsRow.style.display = (contributionChoice === 'withdrawals' || contributionChoice === 'both') && totalWithdrawalsMade > 0 ? 'flex' : 'none';
+            resultTotalWithdrawalsSpan.textContent = formatCurrency(totalWithdrawalsMade);
+            
+            resultInterestSpan.textContent = formatCurrency(totalInterestEarned);
+            resultInterestSpan.classList.remove('light-positive', 'light-negative');
+            if (totalInterestEarned >= 0) { resultInterestSpan.classList.add('light-positive'); } else { resultInterestSpan.classList.add('light-negative'); }
+            
+            resultTotalSpan.textContent = formatCurrency(futureValue);
+            resultTotalSpan.classList.remove('positive', 'negative');
+            if (futureValue >= 0) { resultTotalSpan.classList.add('positive'); } else { resultTotalSpan.classList.add('negative'); }
+            
+            resultsDiv.style.display = 'block';
+            toggleBreakdownBtn.style.display = 'block'; 
+            showMessage('Calculation successful!', 'success'); 
+            
+            if (breakdownSection.style.display === 'block') {
+                renderBreakdownTable(currentBreakdownView);
+            }
+        }
+
+        function renderBreakdownTable(viewType) {
+            breakdownTableBody.innerHTML = ''; 
+            const dataToRender = [];
+            const selectedCurrency = currencySelect.value;
+
+            const formatCurrencyForTable = (value) => {
+                if (selectedCurrency === '¥' || selectedCurrency === '₩') { return `${selectedCurrency}${Math.round(value).toLocaleString()}`; }
+                return `${selectedCurrency}${Number(value).toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})}`;
+            };
+
+            if (viewType === 'yearly') {
+                const years = {};
+                detailedBreakdownData.forEach(itemData => { 
+                    const year = itemData.year;
+                    if (!years[year]) {
+                        years[year] = {
+                            periodType: 'Year', periodNumber: year, year: year,
+                            startingBalance: 0, 
+                            depositsThisPeriod: 0, withdrawalsThisPeriod: 0,
+                            interestEarnedThisPeriod: 0, endingBalance: 0 
+                        };
+                        const firstEntryOfYear = detailedBreakdownData.find(d => d.year === year);
+                        if (firstEntryOfYear) {
+                            years[year].startingBalance = firstEntryOfYear.startingBalance;
+                        }
+                    }
+                    years[year].depositsThisPeriod += itemData.depositsThisPeriod;
+                    years[year].withdrawalsThisPeriod += itemData.withdrawalsThisPeriod;
+                    years[year].interestEarnedThisPeriod += itemData.interestEarnedThisPeriod;
+                    years[year].endingBalance = itemData.endingBalance; 
+                });
+                Object.values(years).forEach(yearData => dataToRender.push(yearData));
+
+            } else { // Monthly or "Period" view from 'none' contribution
+                detailedBreakdownData.forEach(itemData => dataToRender.push(itemData));
+            }
+
+            if (dataToRender.length === 0) {
+                const row = breakdownTableBody.insertRow();
+                const cell = row.insertCell();
+                cell.colSpan = 6; 
+                cell.textContent = 'No breakdown data available. Please perform a calculation.';
+                cell.style.textAlign = 'center';
+                return;
+            }
+
+            dataToRender.forEach((item, index) => { 
+                const row = breakdownTableBody.insertRow();
+                let periodDisplay = `${item.periodType} ${item.periodNumber}`;
+                // For "Period" type when 'none' is selected, the periodNumber might be the compounding period index.
+                // For "Month" type, it's the month number.
+                // This display should be fine as is.
+
+                row.insertCell().textContent = periodDisplay;
+                row.insertCell().textContent = formatCurrencyForTable(item.startingBalance);
+                row.insertCell().textContent = formatCurrencyForTable(item.depositsThisPeriod);
+                row.insertCell().textContent = formatCurrencyForTable(item.withdrawalsThisPeriod);
+                row.insertCell().textContent = formatCurrencyForTable(item.interestEarnedThisPeriod);
+                
+                const endBalanceCell = row.insertCell();
+                endBalanceCell.textContent = formatCurrencyForTable(item.endingBalance);
+
+                if (index === dataToRender.length - 1) {
+                    row.classList.add('last-row-highlight'); 
+                    endBalanceCell.classList.remove('positive', 'negative'); 
+                    if (item.endingBalance >= 0) {
+                        endBalanceCell.classList.add('positive');
+                    } else {
+                        endBalanceCell.classList.add('negative');
+                    }
+                }
+            });
+        }
+
+        function showMessage(message, type) {
+            messageBox.textContent = message; messageBox.style.display = 'block';
+            messageBox.className = 'message-box'; 
+            if (type === 'error') { messageBox.classList.add('message-box-error'); }
+            else if (type === 'success') { messageBox.classList.add('message-box-success'); }
+            else if (type === 'info') { messageBox.classList.remove('message-box-error', 'message-box-success'); }
+        }
+        
+        function clearResultsAndMessages() {
+            resultsDiv.style.display = 'none'; 
+            messageBox.style.display = 'none';
+            messageBox.textContent = ''; messageBox.className = 'message-box';
+            resultTotalDepositsRow.style.display = 'none'; resultTotalWithdrawalsRow.style.display = 'none';
+            resultTotalSpan.classList.remove('positive', 'negative'); 
+            resultInterestSpan.classList.remove('light-positive', 'light-negative');
+            
+            toggleBreakdownBtn.style.display = 'none'; 
+            if (breakdownSection.style.display !== 'none') {
+                 breakdownSection.style.display = 'none';
+                 toggleBreakdownBtn.textContent = 'Show Breakdown';
+            }
+        }
+    </script>
+</body>
+</html>
