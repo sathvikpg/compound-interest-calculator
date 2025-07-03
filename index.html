@@ -799,7 +799,12 @@
 
         // Sidebar Event Listeners
         hamburgerIcon.addEventListener('click', () => {
-            sidebar.classList.add('open');
+            // Toggle the 'open' class based on its current state
+            if (sidebar.classList.contains('open')) {
+                sidebar.classList.remove('open'); // Collapse sidebar
+            } else {
+                sidebar.classList.add('open'); // Open sidebar
+            }
         });
 
         closeBtn.addEventListener('click', () => {
