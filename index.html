@@ -10,12 +10,19 @@
     <title>Compound Interest Calculator</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Favicon Link - Added for the browser tab icon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg width='120' height='120' viewBox='0 0 120 120' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 90 L90 30 M90 30 L65 30 M90 30 L90 55' stroke='%2338A169' stroke-width='12' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+    <!-- You can also use a PNG or ICO file if you save the SVG as one: -->
+    <!-- <link rel="icon" type="image/png" href="/path/to/your/logo.png"> -->
+    <!-- <link rel="icon" type="image/x-icon" href="/path/to/your/favicon.ico"> -->
+
     <style>
         body {
             font-family: 'Inter', sans-serif;
         }
         .calculator-container {
-            max-width: 700px; 
+            max-width: 700px;
             margin: 2rem auto;
             padding: 2rem;
             background-color: #ffffff;
@@ -29,74 +36,74 @@
             display: block;
             margin-bottom: 0.5rem;
             font-weight: 500;
-            color: #374151; 
+            color: #374151;
         }
         .input-field, .select-field {
             width: 100%;
             padding: 0.75rem;
-            border: 1px solid #D1D5DB; 
-            border-radius: 0.375rem; 
+            border: 1px solid #D1D5DB;
+            border-radius: 0.375rem;
             box-shadow: inset 0 1px 2px 0 rgba(0, 0, 0, 0.05);
             transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
             background-color: white;
         }
         .input-field:focus, .select-field:focus {
             outline: none;
-            border-color: #6366F1; 
+            border-color: #6366F1;
             box-shadow: 0 0 0 0.2rem rgba(99, 102, 241, 0.25);
         }
-        .main-button-container { 
+        .main-button-container {
             display: flex;
-            gap: 0.75rem; 
-            margin-top: 1.5rem; 
+            gap: 0.75rem;
+            margin-top: 1.5rem;
         }
-        .calculate-button, .reset-button { 
-            flex-grow: 1; 
-            padding: 0.75rem 1rem; 
+        .calculate-button, .reset-button {
+            flex-grow: 1;
+            padding: 0.75rem 1rem;
             color: white;
             font-weight: 600;
-            border-radius: 0.375rem; 
+            border-radius: 0.375rem;
             transition: background-color 0.15s ease-in-out;
             cursor: pointer;
-            font-size: 0.875rem; 
+            font-size: 0.875rem;
             text-align: center;
         }
         .calculate-button {
-            background-color: #6366F1; 
+            background-color: #6366F1;
         }
         .calculate-button:hover {
-            background-color: #4F46E5; 
+            background-color: #4F46E5;
         }
         .reset-button {
-            background-color: #6B7280; 
+            background-color: #6B7280;
         }
         .reset-button:hover {
-            background-color: #4B5563; 
+            background-color: #4B5563;
         }
-        
-        .toggle-breakdown-button { 
-            width: 100%; 
-            margin-top: 1rem; 
-            padding: 0.75rem 1rem; 
+
+        .toggle-breakdown-button {
+            width: 100%;
+            margin-top: 1rem;
+            padding: 0.75rem 1rem;
             color: white;
             font-weight: 600;
-            border-radius: 0.375rem; 
+            border-radius: 0.375rem;
             transition: background-color 0.15s ease-in-out;
             cursor: pointer;
-            font-size: 0.875rem; 
+            font-size: 0.875rem;
             text-align: center;
-            background-color: #F59E0B; 
-            display: none; 
+            background-color: #F59E0B;
+            display: none;
         }
         .toggle-breakdown-button:hover {
-            background-color: #D97706; 
+            background-color: #D97706;
         }
 
         .results-container {
             margin-top: 2rem;
             padding: 1.5rem;
-            background-color: #F3F4F6; 
-            border-radius: 0.375rem; 
+            background-color: #F3F4F6;
+            border-radius: 0.375rem;
         }
         .result-item {
             display: flex;
@@ -106,17 +113,17 @@
         }
         .result-label {
             font-weight: 500;
-            color: #4B5563; 
+            color: #4B5563;
         }
         .result-value {
             font-weight: 600;
-            color: #1F2937; 
+            color: #1F2937;
         }
-        .result-value.positive { 
-            color: #004225; 
+        .result-value.positive {
+            color: #004225;
         }
-        .result-value.negative { color: #DC2626; } 
-        .result-value.light-positive { color: #22C55E; } 
+        .result-value.negative { color: #DC2626; }
+        .result-value.light-positive { color: #22C55E; }
         .result-value.light-negative { color: #F87171; }
 
         .message-box {
@@ -125,27 +132,27 @@
         }
         .message-box-error { background-color: #FEE2E2; color: #B91C1C; border: 1px solid #FCA5A5; }
         .message-box-success { background-color: #D1FAE5; color: #065F46; border: 1px solid #6EE7B7; }
-        
+
         .contribution-tabs { display: flex; gap: 0.5rem; margin-bottom: 1rem; }
         .contribution-tabs input[type="radio"] { display: none; }
         .contribution-tabs label {
-            flex-grow: 1; text-align: center; padding: 0.625rem 0.5rem; font-size: 0.875rem; 
-            font-weight: 500; color: #4B5563; background-color: #F3F4F6; 
+            flex-grow: 1; text-align: center; padding: 0.625rem 0.5rem; font-size: 0.875rem;
+            font-weight: 500; color: #4B5563; background-color: #F3F4F6;
             border: 1px solid #D1D5DB; border-radius: 0.375rem; cursor: pointer;
             transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out, border-color 0.2s ease-in-out;
-            white-space: nowrap; 
+            white-space: nowrap;
         }
         .contribution-tabs label:hover { background-color: #E5E7EB; }
         .contribution-tabs input[type="radio"]:checked + label { background-color: #6366F1; color: white; border-color: #4F46E5; }
         .contribution-tabs input[type="radio"]#contribDeposits:checked + label { background-color: #16A34A; color: white; border-color: #15803D; }
         .contribution-tabs input[type="radio"]#contribWithdrawals:checked + label { background-color: #DC2626; color: white; border-color: #B91C1C; }
-        
+
         .optional-fields-section { margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid #E5E7EB;}
         .optional-fields-section h3 { font-size: 1.125rem; font-weight: 600; color: #374151; margin-bottom: 1rem; }
         .grid-2-col { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; }
 
         .breakdown-section {
-            margin-top: 2rem; padding: 1.5rem; background-color: #F9FAFB; 
+            margin-top: 2rem; padding: 1.5rem; background-color: #F9FAFB;
             border: 1px solid #E5E7EB; border-radius: 0.375rem;
         }
         .breakdown-controls {
@@ -154,10 +161,10 @@
         .breakdown-controls button {
             padding: 0.5rem 1rem; font-size: 0.875rem; font-weight: 500;
             border-radius: 0.375rem; cursor: pointer; transition: background-color 0.2s, color 0.2s;
-            background-color: #E5E7EB; color: #374151; border: 1px solid #D1D5DB; 
+            background-color: #E5E7EB; color: #374151; border: 1px solid #D1D5DB;
         }
         .breakdown-controls button.active {
-            background-color: #4F46E5; color: white; border-color: #4338CA; 
+            background-color: #4F46E5; color: white; border-color: #4338CA;
         }
         .breakdown-table-container { max-height: 400px; overflow-y: auto; }
         .breakdown-table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
@@ -168,13 +175,13 @@
             background-color: #E5E7EB; font-weight: 600; position: sticky; top: 0; z-index: 10;
         }
         .breakdown-table td {
-            font-weight: 500; 
+            font-weight: 500;
         }
         .breakdown-table td:first-child, .breakdown-table th:first-child { text-align: left; }
-        .breakdown-table td.positive { color: #004225; } 
+        .breakdown-table td.positive { color: #004225; }
         .breakdown-table td.negative { color: #DC2626; }
         .breakdown-table tr.last-row-highlight td {
-            background-color: #E0E7FF; 
+            background-color: #E0E7FF;
         }
 
         /* Sidebar Styles */
@@ -498,7 +505,7 @@
             </div>
         </div>
 
-    </div> 
+    </div>
 
     <div id="educationalContent" class="educational-content">
         <div id="whatIsCompoundInterest" class="content-section">
@@ -692,14 +699,14 @@
         const timeInput = document.getElementById('time');
         const calculateBtn = document.getElementById('calculateBtn');
         const resetBtn = document.getElementById('resetBtn');
-        const toggleBreakdownBtn = document.getElementById('toggleBreakdownBtn'); 
+        const toggleBreakdownBtn = document.getElementById('toggleBreakdownBtn');
         const resultsDiv = document.getElementById('results');
         const resultPrincipalSpan = document.getElementById('resultPrincipal');
         const resultInterestSpan = document.getElementById('resultInterest');
         const resultTotalSpan = document.getElementById('resultTotal');
         const messageBox = document.getElementById('messageBox');
-        const contributionTabsContainer = document.getElementById('contributionTabs'); 
-        const contribNoneRadio = document.getElementById('contribNone'); 
+        const contributionTabsContainer = document.getElementById('contributionTabs');
+        const contribNoneRadio = document.getElementById('contribNone');
         const depositFieldsSection = document.getElementById('depositFieldsSection');
         const depositAmountInput = document.getElementById('depositAmount');
         const depositFrequencySelect = document.getElementById('depositFrequency');
@@ -712,10 +719,10 @@
         const annualWithdrawalIncreaseInput = document.getElementById('annualWithdrawalIncrease');
         const resultTotalWithdrawalsRow = document.getElementById('resultTotalWithdrawalsRow');
         const resultTotalWithdrawalsSpan = document.getElementById('resultTotalWithdrawals');
-        const breakdownSection = document.getElementById('breakdownSection'); 
-        const viewMonthlyBreakdownBtn = document.getElementById('viewMonthlyBreakdownBtn'); 
-        const viewYearlyBreakdownBtn = document.getElementById('viewYearlyBreakdownBtn'); 
-        const breakdownTableBody = document.getElementById('breakdownTableBody'); 
+        const breakdownSection = document.getElementById('breakdownSection');
+        const viewMonthlyBreakdownBtn = document.getElementById('viewMonthlyBreakdownBtn');
+        const viewYearlyBreakdownBtn = document.getElementById('viewYearlyBreakdownBtn');
+        const breakdownTableBody = document.getElementById('breakdownTableBody');
 
         // Sidebar and Educational Content Elements
         const hamburgerIcon = document.getElementById('hamburgerIcon');
@@ -726,13 +733,13 @@
         const contentSections = document.querySelectorAll('.content-section');
 
 
-        let detailedBreakdownData = []; 
-        let currentBreakdownView = 'monthly'; 
+        let detailedBreakdownData = [];
+        let currentBreakdownView = 'monthly';
 
         // Event Listeners
         currencySelect.addEventListener('change', (event) => {
             principalCurrencyLabel.textContent = event.target.value;
-            clearResultsAndMessages(); 
+            clearResultsAndMessages();
         });
 
         contributionTabsContainer.addEventListener('click', (event) => {
@@ -744,14 +751,14 @@
                 }
             }
         });
-        
+
         toggleBreakdownBtn.addEventListener('click', () => {
             const isHidden = breakdownSection.style.display === 'none' || breakdownSection.style.display === '';
             if (isHidden) {
                 if (detailedBreakdownData.length > 0) {
                     breakdownSection.style.display = 'block';
                     toggleBreakdownBtn.textContent = 'Hide Breakdown';
-                    renderBreakdownTable(currentBreakdownView); 
+                    renderBreakdownTable(currentBreakdownView);
                 } else {
                     showMessage('Calculate first to see the breakdown.', 'info');
                 }
@@ -760,7 +767,7 @@
                 toggleBreakdownBtn.textContent = 'Show Breakdown';
             }
         });
-        
+
         viewMonthlyBreakdownBtn.addEventListener('click', () => {
             currentBreakdownView = 'monthly';
             viewMonthlyBreakdownBtn.classList.add('active');
@@ -777,19 +784,19 @@
         resetBtn.addEventListener('click', resetCalculator);
         calculateBtn.addEventListener('click', performCalculation);
 
-        const allInputs = [ 
-            principalInput, rateInput, frequencyInput, timeInput, 
+        const allInputs = [
+            principalInput, rateInput, frequencyInput, timeInput,
             depositAmountInput, depositFrequencySelect, annualDepositIncreaseInput,
             withdrawalAmountInput, withdrawalFrequencySelect, annualWithdrawalIncreaseInput,
-            currencySelect 
+            currencySelect
         ];
-        allInputs.forEach(input => { 
-            if (input) { 
+        allInputs.forEach(input => {
+            if (input) {
                 input.addEventListener('input', clearResultsAndMessages);
                 if (input.tagName === 'SELECT') { input.addEventListener('change', clearResultsAndMessages); }
             }
         });
-        
+
         // Initial Setup
         const initiallyCheckedRadio = document.querySelector('input[name="contributionType"]:checked');
         if (initiallyCheckedRadio) { updateContributionSections(initiallyCheckedRadio.value); }
@@ -814,7 +821,7 @@
         sidebarLinks.forEach(link => {
             link.addEventListener('click', (event) => {
                 const targetId = event.target.dataset.target;
-                
+
                 // Hide all content sections first
                 contentSections.forEach(section => {
                     section.style.display = 'none';
@@ -836,38 +843,38 @@
         function updateContributionSections(type) {
             depositFieldsSection.style.display = (type === 'deposits' || type === 'both') ? 'block' : 'none';
             withdrawalFieldsSection.style.display = (type === 'withdrawals' || type === 'both') ? 'block' : 'none';
-            
+
             // Reset specific fields when their section is hidden
             if (type !== 'deposits' && type !== 'both') {
-                 depositAmountInput.value = ''; 
-                 annualDepositIncreaseInput.value = ''; 
+                 depositAmountInput.value = '';
+                 annualDepositIncreaseInput.value = '';
                  depositFrequencySelect.value = "12"; // Default
             }
-            if (type !== 'withdrawals' && type !== 'both') { 
-                withdrawalAmountInput.value = ''; 
-                annualWithdrawalIncreaseInput.value = ''; 
+            if (type !== 'withdrawals' && type !== 'both') {
+                withdrawalAmountInput.value = '';
+                annualWithdrawalIncreaseInput.value = '';
                 withdrawalFrequencySelect.value = "12"; // Default
             }
             clearResultsAndMessages();
         }
-        
+
         function resetCalculator() {
             principalInput.value = ''; rateInput.value = ''; timeInput.value = '';
             currencySelect.value = '₹'; // Set back to Indian Rupee as default
             principalCurrencyLabel.textContent = '₹';
             frequencyInput.value = '12';
             if (contribNoneRadio) { contribNoneRadio.checked = true; }
-            updateContributionSections('none'); 
-            
-            detailedBreakdownData = []; 
-            breakdownSection.style.display = 'none'; 
-            toggleBreakdownBtn.style.display = 'none'; 
+            updateContributionSections('none');
+
+            detailedBreakdownData = [];
+            breakdownSection.style.display = 'none';
+            toggleBreakdownBtn.style.display = 'none';
             toggleBreakdownBtn.textContent = 'Show Breakdown';
-            currentBreakdownView = 'monthly'; 
+            currentBreakdownView = 'monthly';
             viewMonthlyBreakdownBtn.classList.add('active');
             viewYearlyBreakdownBtn.classList.remove('active');
             showMessage('Calculator has been reset.', 'info');
-            
+
             // Hide all educational content sections upon reset
             contentSections.forEach(section => {
                 section.style.display = 'none';
@@ -875,8 +882,8 @@
         }
 
         function performCalculation() {
-            clearResultsAndMessages(); 
-            detailedBreakdownData = []; 
+            clearResultsAndMessages();
+            detailedBreakdownData = [];
 
             const principal = parseFloat(principalInput.value);
             const annualRateDecimal = parseFloat(rateInput.value) / 100;
@@ -884,7 +891,7 @@
             const timeYears = parseFloat(timeInput.value);
             const selectedCurrency = currencySelect.value;
             const contributionChoice = document.querySelector('input[name="contributionType"]:checked').value;
-            
+
             if (isNaN(principal) || principal < 0) { showMessage('Please enter a valid principal amount.', 'error'); principalInput.focus(); return; }
             if (isNaN(annualRateDecimal) || annualRateDecimal <= 0) { showMessage('Please enter a valid annual interest rate.', 'error'); rateInput.focus(); return; }
             if (isNaN(mainCompoundingFreqPerYear) || mainCompoundingFreqPerYear <= 0) { showMessage('Please select a valid main compounding frequency.', 'error'); return; }
@@ -896,7 +903,7 @@
             let depositAmountPerOccurrence = 0, depositFreqPeriodsPerYear = 0, annualDepositIncreaseDecimal = 0;
             let withdrawalAmountPerOccurrence = 0, withdrawalFreqPeriodsPerYear = 0, annualWithdrawalIncreaseDecimal = 0;
 
-            if (contributionChoice === 'deposits' || contributionChoice === 'both') {  
+            if (contributionChoice === 'deposits' || contributionChoice === 'both') {
                 depositAmountPerOccurrence = parseFloat(depositAmountInput.value) || 0; // Default to 0 if NaN
                 depositFreqPeriodsPerYear = parseInt(depositFrequencySelect.value);
                 annualDepositIncreaseDecimal = (parseFloat(annualDepositIncreaseInput.value) || 0) / 100;
@@ -904,7 +911,7 @@
                 if (isNaN(depositFreqPeriodsPerYear) || depositFreqPeriodsPerYear <= 0) { showMessage('Valid deposit frequency needed.', 'error'); return; }
                 if (isNaN(annualDepositIncreaseDecimal) || annualDepositIncreaseDecimal < 0) { showMessage('Deposit increase must be non-negative.', 'error'); return;}
             }
-            if (contributionChoice === 'withdrawals' || contributionChoice === 'both') { 
+            if (contributionChoice === 'withdrawals' || contributionChoice === 'both') {
                 withdrawalAmountPerOccurrence = parseFloat(withdrawalAmountInput.value) || 0; // Default to 0 if NaN
                 withdrawalFreqPeriodsPerYear = parseInt(withdrawalFrequencySelect.value);
                 annualWithdrawalIncreaseDecimal = (parseFloat(annualWithdrawalIncreaseInput.value) || 0) / 100;
@@ -922,10 +929,10 @@
                     const interestThisPeriod = currentLoopBalance * ratePerPeriod;
                     const startBal = currentLoopBalance;
                     currentLoopBalance += interestThisPeriod;
-                    
+
                     detailedBreakdownData.push({
-                        periodType: 'Period', 
-                        periodNumber: period, 
+                        periodType: 'Period',
+                        periodNumber: period,
                         year: Math.ceil(period / mainCompoundingFreqPerYear),
                         startingBalance: startBal,
                         depositsThisPeriod: 0,
@@ -937,7 +944,7 @@
                 futureValue = currentLoopBalance;
                 totalInterestEarned = futureValue - principal;
 
-            } else { 
+            } else {
                 let currentBalance = principal;
                 let currentActualPeriodicDeposit = depositAmountPerOccurrence;
                 let currentActualPeriodicWithdrawal = withdrawalAmountPerOccurrence;
@@ -948,11 +955,11 @@
                     let depositsThisMonthTotal = 0; // Total deposits in this specific month
                     let withdrawalsThisMonthTotal = 0; // Total withdrawals in this specific month
 
-                    if (month > 1 && (month - 1) % 12 === 0) { 
+                    if (month > 1 && (month - 1) % 12 === 0) {
                         if (contributionChoice === 'deposits' || contributionChoice === 'both') { if(annualDepositIncreaseDecimal > 0) currentActualPeriodicDeposit *= (1 + annualDepositIncreaseDecimal); }
                         if (contributionChoice === 'withdrawals' || contributionChoice === 'both') { if(annualWithdrawalIncreaseDecimal > 0) currentActualPeriodicWithdrawal *= (1 + annualWithdrawalIncreaseDecimal); }
                     }
-                    
+
                     // Calculate total deposits for the current month
                     if ((contributionChoice === 'deposits' || contributionChoice === 'both') && depositFreqPeriodsPerYear > 0 && currentActualPeriodicDeposit > 0) {
                         if (depositFreqPeriodsPerYear === 365) { // Daily
@@ -987,15 +994,15 @@
                         totalWithdrawalsMade += amountToWithdraw;
                         withdrawalsThisMonthTotal = amountToWithdraw;
                     }
-                    
+
                     const balanceBeforeInterest = currentBalance;
                     const monthlyGrowthFactor = Math.pow(1 + (annualRateDecimal / mainCompoundingFreqPerYear), mainCompoundingFreqPerYear / 12.0);
                     let interestThisMonth = 0;
-                    if (currentBalance > 0) { 
+                    if (currentBalance > 0) {
                         currentBalance *= monthlyGrowthFactor;
                         interestThisMonth = currentBalance - balanceBeforeInterest;
                     }
-                    
+
                     detailedBreakdownData.push({
                         periodType: 'Month',
                         periodNumber: month,
@@ -1012,7 +1019,7 @@
             }
 
             // Display Results
-            const formatCurrency = (value) => { 
+            const formatCurrency = (value) => {
                 if (selectedCurrency === '¥' || selectedCurrency === '₩') { return `${selectedCurrency}${Math.round(value).toLocaleString()}`; }
                 const fixedValue = value.toFixed(2); const parts = fixedValue.split('.');
                 parts[0] = parseFloat(parts[0]).toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0});
@@ -1024,26 +1031,26 @@
             resultTotalDepositsSpan.textContent = formatCurrency(totalDepositsMade);
             resultTotalWithdrawalsRow.style.display = (contributionChoice === 'withdrawals' || contributionChoice === 'both') && totalWithdrawalsMade > 0 ? 'flex' : 'none';
             resultTotalWithdrawalsSpan.textContent = formatCurrency(totalWithdrawalsMade);
-            
+
             resultInterestSpan.textContent = formatCurrency(totalInterestEarned);
             resultInterestSpan.classList.remove('light-positive', 'light-negative');
             if (totalInterestEarned >= 0) { resultInterestSpan.classList.add('light-positive'); } else { resultInterestSpan.classList.add('light-negative'); }
-            
+
             resultTotalSpan.textContent = formatCurrency(futureValue);
             resultTotalSpan.classList.remove('positive', 'negative');
             if (futureValue >= 0) { resultTotalSpan.classList.add('positive'); } else { resultTotalSpan.classList.add('negative'); }
-            
+
             resultsDiv.style.display = 'block';
-            toggleBreakdownBtn.style.display = 'block'; 
-            showMessage('Calculation successful!', 'success'); 
-            
+            toggleBreakdownBtn.style.display = 'block';
+            showMessage('Calculation successful!', 'success');
+
             if (breakdownSection.style.display === 'block') {
                 renderBreakdownTable(currentBreakdownView);
             }
         }
 
         function renderBreakdownTable(viewType) {
-            breakdownTableBody.innerHTML = ''; 
+            breakdownTableBody.innerHTML = '';
             const dataToRender = [];
             const selectedCurrency = currencySelect.value;
 
@@ -1054,16 +1061,16 @@
 
             if (viewType === 'yearly') {
                 const years = {};
-                detailedBreakdownData.forEach(itemData => { 
+                detailedBreakdownData.forEach(itemData => {
                     const year = itemData.year;
                     if (!years[year]) {
                         years[year] = {
                             periodType: 'Year', periodNumber: year, year: year,
-                            startingBalance: 0, 
+                            startingBalance: 0,
                             depositsThisPeriod: 0, withdrawalsThisPeriod: 0,
-                            interestEarnedThisPeriod: 0, endingBalance: 0 
+                            interestEarnedThisPeriod: 0, endingBalance: 0
                         };
-                        // For yearly view, the starting balance of a year should be the ending balance of the previous year's last period, 
+                        // For yearly view, the starting balance of a year should be the ending balance of the previous year's last period,
                         // or the initial principal if it's the very first year.
                         // We need to find the balance at the end of the previous year or the start of the first month.
                         const lastBalanceOfPrevYear = detailedBreakdownData.findLast(d => d.year === year - 1);
@@ -1087,13 +1094,13 @@
             if (dataToRender.length === 0) {
                 const row = breakdownTableBody.insertRow();
                 const cell = row.insertCell();
-                cell.colSpan = 6; 
+                cell.colSpan = 6;
                 cell.textContent = 'No breakdown data available. Please perform a calculation.';
                 cell.style.textAlign = 'center';
                 return;
             }
 
-            dataToRender.forEach((item, index) => { 
+            dataToRender.forEach((item, index) => {
                 const row = breakdownTableBody.insertRow();
                 let periodDisplay = `${item.periodType} ${item.periodNumber}`;
                 // For "Period" type when 'none' is selected, the periodNumber might be the compounding period index.
@@ -1105,13 +1112,13 @@
                 row.insertCell().textContent = formatCurrencyForTable(item.depositsThisPeriod);
                 row.insertCell().textContent = formatCurrencyForTable(item.withdrawalsThisPeriod);
                 row.insertCell().textContent = formatCurrencyForTable(item.interestEarnedThisPeriod);
-                
+
                 const endBalanceCell = row.insertCell();
                 endBalanceCell.textContent = formatCurrencyForTable(item.endingBalance);
 
                 if (index === dataToRender.length - 1) {
-                    row.classList.add('last-row-highlight'); 
-                    endBalanceCell.classList.remove('positive', 'negative'); 
+                    row.classList.add('last-row-highlight');
+                    endBalanceCell.classList.remove('positive', 'negative');
                     if (item.endingBalance >= 0) {
                         endBalanceCell.classList.add('positive');
                     } else {
@@ -1123,21 +1130,21 @@
 
         function showMessage(message, type) {
             messageBox.textContent = message; messageBox.style.display = 'block';
-            messageBox.className = 'message-box'; 
+            messageBox.className = 'message-box';
             if (type === 'error') { messageBox.classList.add('message-box-error'); }
             else if (type === 'success') { messageBox.classList.add('message-box-success'); }
             else if (type === 'info') { messageBox.classList.remove('message-box-error', 'message-box-success'); }
         }
-        
+
         function clearResultsAndMessages() {
-            resultsDiv.style.display = 'none'; 
+            resultsDiv.style.display = 'none';
             messageBox.style.display = 'none';
             messageBox.textContent = ''; messageBox.className = 'message-box';
             resultTotalDepositsRow.style.display = 'none'; resultTotalWithdrawalsRow.style.display = 'none';
-            resultTotalSpan.classList.remove('positive', 'negative'); 
+            resultTotalSpan.classList.remove('positive', 'negative');
             resultInterestSpan.classList.remove('light-positive', 'light-negative');
-            
-            toggleBreakdownBtn.style.display = 'none'; 
+
+            toggleBreakdownBtn.style.display = 'none';
             if (breakdownSection.style.display !== 'none') {
                  breakdownSection.style.display = 'none';
                  toggleBreakdownBtn.textContent = 'Show Breakdown';
@@ -1146,3 +1153,4 @@
     </script>
 </body>
 </html>
+
