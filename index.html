@@ -159,34 +159,67 @@
         .grid-2-col { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; }
 
         .breakdown-section {
-            margin-top: 2rem; padding: 1.5rem; background-color: #F9FAFB;
-            border: 1px solid #E5E7EB; border-radius: 0.375rem;
+            margin-top: 2rem;
+            padding: 1.5rem;
+            background-color: #F9FAFB;
+            border: 1px solid #E5E7EB;
+            border-radius: 0.375rem;
         }
         .breakdown-controls {
-            display: flex; gap: 0.5rem; margin-bottom: 1rem; justify-content: center;
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            justify-content: center;
         }
         .breakdown-controls button {
-            padding: 0.5rem 1rem; font-size: 0.875rem; font-weight: 500;
-            border-radius: 0.375rem; cursor: pointer; transition: background-color 0.2s, color 0.2s;
-            background-color: #E5E7EB; color: #374151; border: 1px solid #D1D5DB;
+            padding: 0.5rem 1rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            border-radius: 0.375rem;
+            cursor: pointer;
+            transition: background-color 0.2s, color 0.2s;
+            background-color: #E5E7EB;
+            color: #374151;
+            border: 1px solid #D1D5DB;
         }
         .breakdown-controls button.active {
-            background-color: #4F46E5; color: white; border-color: #4338CA;
+            background-color: #4F46E5;
+            color: white;
+            border-color: #4338CA;
         }
-        .breakdown-table-container { max-height: 400px; overflow-y: auto; }
-        .breakdown-table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
+        .breakdown-table-container {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .breakdown-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.875rem;
+        }
         .breakdown-table th, .breakdown-table td {
-            border: 1px solid #D1D5DB; padding: 0.5rem; text-align: right;
+            border: 1px solid #D1D5DB;
+            padding: 0.5rem;
+            text-align: right;
         }
         .breakdown-table th {
-            background-color: #E5E7EB; font-weight: 600; position: sticky; top: 0; z-index: 10;
+            background-color: #E5E7EB;
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+            z-index: 10;
         }
         .breakdown-table td {
             font-weight: 500;
         }
-        .breakdown-table td:first-child, .breakdown-table th:first-child { text-align: left; }
-        .breakdown-table td.positive { color: #004225; }
-        .breakdown-table td.negative { color: #DC2626; }
+        .breakdown-table td:first-child, .breakdown-table th:first-child {
+            text-align: left;
+        }
+        .breakdown-table td.positive {
+            color: #004225;
+        }
+        .breakdown-table td.negative {
+            color: #DC2626;
+        }
         .breakdown-table tr.last-row-highlight td {
             background-color: #E0E7FF;
         }
@@ -572,9 +605,9 @@
             <p>The frequency of compounding refers to how often the earned interest is added back to the principal. The more frequently interest is compounded, the faster your money grows, as you start earning interest on your interest sooner.</p>
             <p>Common compounding frequencies include:</p>
             <ul>
-                <li><strong>Annually (n=1):</strong> Interest is calculated and added once a year.</li>
+                <li><strong>Annually (n=1):</b> Interest is calculated and added once a year.</li>
                 <li><strong>Semi-annually (n=2):</strong> Interest is calculated and added twice a year.</li>
-                <li><strong>Quarterly (n=4):</strong> Interest is calculated and added four times a year.</li>
+                <li><strong>Quarterly (n=4):</b> Interest is calculated and added four times a year.</li>
                 <li><strong>Monthly (n=12):</strong> Interest is calculated and added twelve times a year.</li>
                 <li><strong>Daily (n=365):</strong> Interest is calculated and added every day.</li>
             </ul>
@@ -584,7 +617,7 @@
                 <li><strong>Annually:</strong> ₹11,576.25</li>
                 <li><strong>Semi-annually:</strong> $A = 10000(1+0.05/2)^{2*3} = 10000(1.025)^6 = ₹11,596.93$</li>
                 <li><strong>Monthly:</strong> $A = 10000(1+0.05/12)^{12*3} = 10000(1.0041666)^{36} = ₹11,614.72$</li>
-                <li><strong>Daily:</strong> $A = 10000(1+0.05/365)^{365*3} = 10000(1.0001369)^{1095} = ₹11,618.34$</li>
+                <li><strong>Daily:</b> $A = 10000(1+0.05/365)^{365*3} = 10000(1.0001369)^{1095} = ₹11,618.34$</li>
             </ul>
             <p>As you can see, the more frequent the compounding, the slightly higher the final return. While the difference might seem small in short periods, it becomes more significant over longer investment horizons.</p>
         </div>
@@ -805,11 +838,18 @@
             }
         });
 
-        // Initial Setup
-        const initiallyCheckedRadio = document.querySelector('input[name="contributionType"]:checked');
-        if (initiallyCheckedRadio) { updateContributionSections(initiallyCheckedRadio.value); }
-        // Set initial currency label based on selected option in HTML (Indian Rupee is selected by default now)
-        principalCurrencyLabel.textContent = currencySelect.options[currencySelect.selectedIndex].value;
+        // Initial Setup - Wrapped in DOMContentLoaded for robustness
+        document.addEventListener('DOMContentLoaded', () => {
+            const initiallyCheckedRadio = document.querySelector('input[name="contributionType"]:checked');
+            if (initiallyCheckedRadio) {
+                updateContributionSections(initiallyCheckedRadio.value);
+            } else {
+                // Default to 'none' if no radio is checked initially (e.g., if 'checked' attribute is missing in HTML)
+                updateContributionSections('none');
+            }
+            // Set initial currency label based on selected option in HTML (Indian Rupee is selected by default now)
+            principalCurrencyLabel.textContent = currencySelect.options[currencySelect.selectedIndex].value;
+        });
 
 
         // Sidebar Event Listeners
@@ -905,28 +945,10 @@
             if (isNaN(mainCompoundingFreqPerYear) || mainCompoundingFreqPerYear <= 0) { showMessage('Please select a valid main compounding frequency.', 'error'); return; }
             if (isNaN(timeYears) || timeYears <= 0) { showMessage('Please enter a valid time period in years.', 'error'); timeInput.focus(); return; }
 
-            let futureValue = 0; let totalInterestEarned = 0;
-            let totalDepositsMade = 0; let totalWithdrawalsMade = 0;
-
-            let depositAmountPerOccurrence = 0, depositFreqPeriodsPerYear = 0, annualDepositIncreaseDecimal = 0;
-            let withdrawalAmountPerOccurrence = 0, withdrawalFreqPeriodsPerYear = 0, annualWithdrawalIncreaseDecimal = 0;
-
-            if (contributionChoice === 'deposits' || contributionChoice === 'both') {
-                depositAmountPerOccurrence = parseFloat(depositAmountInput.value) || 0; // Default to 0 if NaN
-                depositFreqPeriodsPerYear = parseInt(depositFrequencySelect.value);
-                annualDepositIncreaseDecimal = (parseFloat(annualDepositIncreaseInput.value) || 0) / 100;
-                if (depositAmountPerOccurrence < 0) { showMessage('Deposit amount cannot be negative.', 'error'); return; }
-                if (isNaN(depositFreqPeriodsPerYear) || depositFreqPeriodsPerYear <= 0) { showMessage('Valid deposit frequency needed.', 'error'); return; }
-                if (isNaN(annualDepositIncreaseDecimal) || annualDepositIncreaseDecimal < 0) { showMessage('Deposit increase must be non-negative.', 'error'); return;}
-            }
-            if (contributionChoice === 'withdrawals' || contributionChoice === 'both') {
-                withdrawalAmountPerOccurrence = parseFloat(withdrawalAmountInput.value) || 0; // Default to 0 if NaN
-                withdrawalFreqPeriodsPerYear = parseInt(withdrawalFrequencySelect.value);
-                annualWithdrawalIncreaseDecimal = (parseFloat(annualWithdrawalIncreaseInput.value) || 0) / 100;
-                if (withdrawalAmountPerOccurrence < 0) { showMessage('Withdrawal amount cannot be negative.', 'error'); return; }
-                if (isNaN(withdrawalFreqPeriodsPerYear) || withdrawalFreqPeriodsPerYear <= 0) { showMessage('Valid withdrawal frequency needed.', 'error'); return; }
-                if (isNaN(annualWithdrawalIncreaseDecimal) || annualWithdrawalIncreaseDecimal < 0) { showMessage('Withdrawal increase must be non-negative.', 'error'); return;}
-            }
+            let futureValue = 0;
+            let totalDepositsMade = 0;
+            let totalWithdrawalsMade = 0;
+            let totalInterestEarned = 0; // This will accumulate interest as per the reference's specific method
 
             if (contributionChoice === 'none') {
                 const ratePerPeriod = annualRateDecimal / mainCompoundingFreqPerYear;
@@ -953,77 +975,101 @@
                 totalInterestEarned = futureValue - principal;
 
             } else {
-                let currentBalance = principal;
-                let currentActualPeriodicDeposit = depositAmountPerOccurrence;
-                let currentActualPeriodicWithdrawal = withdrawalAmountPerOccurrence;
+                let currentActualPeriodicDeposit = parseFloat(depositAmountInput.value) || 0;
+                let depositFreqPeriodsPerYear = parseInt(depositFrequencySelect.value);
+                let annualDepositIncreaseDecimal = (parseFloat(annualDepositIncreaseInput.value) || 0) / 100;
+
+                let currentActualPeriodicWithdrawal = parseFloat(withdrawalAmountInput.value) || 0;
+                let withdrawalFreqPeriodsPerYear = parseInt(withdrawalFrequencySelect.value);
+                let annualWithdrawalIncreaseDecimal = (parseFloat(annualWithdrawalIncreaseInput.value) || 0) / 100;
+
+                if ((contributionChoice === 'deposits' || contributionChoice === 'both') && (currentActualPeriodicDeposit < 0 || isNaN(depositFreqPeriodsPerYear) || depositFreqPeriodsPerYear <= 0 || annualDepositIncreaseDecimal < 0)) { showMessage('Invalid deposit inputs.', 'error'); return; }
+                if ((contributionChoice === 'withdrawals' || contributionChoice === 'both') && (currentActualPeriodicWithdrawal < 0 || isNaN(withdrawalFreqPeriodsPerYear) || withdrawalFreqPeriodsPerYear <= 0 || annualWithdrawalIncreaseDecimal < 0)) { showMessage('Invalid withdrawal inputs.', 'error'); return; }
+
+                // This will be the final "Future Value"
+                let actualRunningBalance = principal;
+
+                // This represents the "Balance" column in the reference breakdown table.
+                // It tracks principal +/- cash flows, but NOT the interest itself.
+                let balanceForBreakdownTable = principal;
+
+
                 const totalMonthsToSimulate = Math.round(timeYears * 12);
 
                 for (let month = 1; month <= totalMonthsToSimulate; month++) {
-                    const startingBalanceThisMonth = currentBalance;
-                    let depositsThisMonthTotal = 0; // Total deposits in this specific month
-                    let withdrawalsThisMonthTotal = 0; // Total withdrawals in this specific month
+                    const startingBalanceForBreakdown = balanceForBreakdownTable; // This is the 'Balance' from the previous month's end in reference
 
+                    let depositsThisMonthTotal = 0;
+                    let withdrawalsThisMonthTotal = 0;
+
+                    // Apply annual increase to periodic amounts
                     if (month > 1 && (month - 1) % 12 === 0) {
                         if (contributionChoice === 'deposits' || contributionChoice === 'both') { if(annualDepositIncreaseDecimal > 0) currentActualPeriodicDeposit *= (1 + annualDepositIncreaseDecimal); }
                         if (contributionChoice === 'withdrawals' || contributionChoice === 'both') { if(annualWithdrawalIncreaseDecimal > 0) currentActualPeriodicWithdrawal *= (1 + annualWithdrawalIncreaseDecimal); }
                     }
 
-                    // Calculate total deposits for the current month
+                    // Calculate deposits for the current month
                     if ((contributionChoice === 'deposits' || contributionChoice === 'both') && depositFreqPeriodsPerYear > 0 && currentActualPeriodicDeposit > 0) {
+                        let depositOccurrencesInMonth = 0;
                         if (depositFreqPeriodsPerYear === 365) { // Daily
-                            depositsThisMonthTotal = currentActualPeriodicDeposit * (365 / 12); // Average days
+                            depositOccurrencesInMonth = (365 / 12);
                         } else if (depositFreqPeriodsPerYear === 52) { // Weekly
-                            depositsThisMonthTotal = currentActualPeriodicDeposit * (52 / 12); // Average weeks
+                            depositOccurrencesInMonth = (52 / 12);
                         } else { // Monthly, Quarterly, Semi-Annually, Annually
                             const depositIntervalMonths = 12 / depositFreqPeriodsPerYear;
                             if (month % depositIntervalMonths === 0) {
-                                depositsThisMonthTotal = currentActualPeriodicDeposit;
+                                depositOccurrencesInMonth = 1;
                             }
                         }
-                        currentBalance += depositsThisMonthTotal;
-                        totalDepositsMade += depositsThisMonthTotal;
+                        depositsThisMonthTotal = currentActualPeriodicDeposit * depositOccurrencesInMonth;
                     }
 
-                    // Calculate total withdrawals for the current month
+                    // Calculate withdrawals for the current month
                     if ((contributionChoice === 'withdrawals' || contributionChoice === 'both') && withdrawalFreqPeriodsPerYear > 0 && currentActualPeriodicWithdrawal > 0) {
-                        let actualWithdrawalThisMonth = 0;
+                        let withdrawalOccurrencesInMonth = 0;
                         if (withdrawalFreqPeriodsPerYear === 365) { // Daily
-                            actualWithdrawalThisMonth = currentActualPeriodicWithdrawal * (365 / 12);
+                            withdrawalOccurrencesInMonth = (365 / 12);
                         } else if (withdrawalFreqPeriodsPerYear === 52) { // Weekly
-                            actualWithdrawalThisMonth = currentActualPeriodicWithdrawal * (52 / 12);
+                            withdrawalOccurrencesInMonth = (52 / 12);
                         } else { // Monthly, Quarterly, Semi-Annually, Annually
                             const withdrawalIntervalMonths = 12 / withdrawalFreqPeriodsPerYear;
                             if (month % withdrawalIntervalMonths === 0) {
-                                actualWithdrawalThisMonth = currentActualPeriodicWithdrawal;
+                                withdrawalOccurrencesInMonth = 1;
                             }
                         }
-                        // FIX: Allow currentBalance to go negative if withdrawal exceeds current balance
-                        currentBalance -= actualWithdrawalThisMonth;
-                        totalWithdrawalsMade += actualWithdrawalThisMonth; // Accumulate the full requested withdrawal
-                        withdrawalsThisMonthTotal = actualWithdrawalThisMonth;
+                        withdrawalsThisMonthTotal = currentActualPeriodicWithdrawal * withdrawalOccurrencesInMonth;
                     }
 
-                    const balanceBeforeInterest = currentBalance;
-                    // Interest calculation should still apply even if balance is negative (debt accrual)
-                    const monthlyGrowthFactor = Math.pow(1 + (annualRateDecimal / mainCompoundingFreqPerYear), mainCompoundingFreqPerYear / 12.0);
-                    currentBalance *= monthlyGrowthFactor;
-                    let interestThisMonth = currentBalance - balanceBeforeInterest;
+                    // --- ORDER OF OPERATIONS TO MATCH REFERENCE'S BREAKDOWN TABLE ---
 
+                    // 1. Calculate interest for *this* month based on the 'balanceForBreakdownTable' from the start of the month (previous period's end balance)
+                    let interestThisMonth = startingBalanceForBreakdown * (annualRateDecimal / 12);
+
+                    // 2. Update the 'balanceForBreakdownTable' with current month's deposits and withdrawals
+                    balanceForBreakdownTable = balanceForBreakdownTable + depositsThisMonthTotal - withdrawalsThisMonthTotal;
+
+                    // 3. Update the 'actualRunningBalance' by applying deposits, withdrawals, and then the calculated interest
+                    actualRunningBalance = actualRunningBalance + depositsThisMonthTotal - withdrawalsThisMonthTotal + interestThisMonth;
+
+                    // Accumulate total deposits and withdrawals for summary
+                    totalDepositsMade += depositsThisMonthTotal;
+                    totalWithdrawalsMade += withdrawalsThisMonthTotal;
+
+                    // Accumulate total interest earned (this should match the 'Accrued Interest' column in reference)
+                    totalInterestEarned += interestThisMonth;
 
                     detailedBreakdownData.push({
                         periodType: 'Month',
                         periodNumber: month,
                         year: Math.ceil(month / 12),
-                        startingBalance: startingBalanceThisMonth,
+                        startingBalance: startingBalanceForBreakdown, // This is the "Balance" from previous month in reference
                         depositsThisPeriod: depositsThisMonthTotal,
                         withdrawalsThisPeriod: withdrawalsThisMonthTotal,
                         interestEarnedThisPeriod: interestThisMonth,
-                        endingBalance: currentBalance
+                        endingBalance: balanceForBreakdownTable // This is the 'Balance' column value for current month in reference
                     });
                 }
-                futureValue = currentBalance;
-                // Recalculate totalInterestEarned based on final futureValue and total movements
-                totalInterestEarned = futureValue - principal - totalDepositsMade + totalWithdrawalsMade;
+                futureValue = actualRunningBalance; // The final actual running balance
             }
 
             // Display Results
@@ -1044,7 +1090,7 @@
 
                 let finalString = `${selectedCurrency}${formattedNumber}`;
 
-                // Only prepend '-' if value is truly negative and includeSign is true, or if it's 0 and we want to show it as negative zero
+                // Only prepend '-' if value is truly negative and includeSign is true
                 if (isNegative && includeSign) {
                     return `-${finalString}`;
                 } else if (value === 0) {
@@ -1062,7 +1108,7 @@
             resultTotalWithdrawalsRow.style.display = (contributionChoice === 'withdrawals' || contributionChoice === 'both') && totalWithdrawalsMade > 0 ? 'flex' : 'none';
             resultTotalWithdrawalsSpan.textContent = formatCurrency(totalWithdrawalsMade);
             // Withdrawals are always red if displayed and totalWithdrawalsMade is a positive value
-            if (totalWithdrawalsMade > 0) { // Check the actual value, not just if the row is displayed
+            if (totalWithdrawalsMade > 0) { // Check the actual value, not just if the row is visible
                 resultTotalWithdrawalsSpan.classList.add('negative');
             } else {
                 resultTotalWithdrawalsSpan.classList.remove('negative');
@@ -1071,13 +1117,13 @@
 
             // Handle Total Interest Earned/Lost label and color
             resultInterestSpan.classList.remove('light-positive', 'light-negative');
+
+            // Always display "Total Interest Earned:" and let the value's sign indicate gain/loss
+            resultInterestLabel.textContent = 'Total Interest Earned:';
+            resultInterestSpan.textContent = formatCurrency(totalInterestEarned, true); // Always show sign for interest
             if (totalInterestEarned < 0) {
-                resultInterestLabel.textContent = 'Total Interest Lost:';
-                resultInterestSpan.textContent = formatCurrency(totalInterestEarned, true); // Pass true to include sign
                 resultInterestSpan.classList.add('light-negative');
             } else {
-                resultInterestLabel.textContent = 'Total Interest Earned:';
-                resultInterestSpan.textContent = formatCurrency(totalInterestEarned, false); // No explicit positive sign needed
                 resultInterestSpan.classList.add('light-positive');
             }
 
@@ -1198,6 +1244,7 @@
 
                 const interestCell = row.insertCell();
                 interestCell.textContent = formatCurrencyForTable(item.interestEarnedThisPeriod, true); // Include sign for interest
+                // Apply color based on actual interest earned for the period
                 if (item.interestEarnedThisPeriod < 0) { interestCell.classList.add('light-negative'); }
                 else if (item.interestEarnedThisPeriod > 0) { interestCell.classList.add('light-positive'); }
 
