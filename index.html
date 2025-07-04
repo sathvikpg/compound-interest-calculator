@@ -119,12 +119,19 @@
             font-weight: 600;
             color: #1F2937;
         }
+        /* Updated color classes for consistency */
         .result-value.positive {
-            color: #004225;
+            color: #004225; /* Dark Green */
         }
-        .result-value.negative { color: #DC2626; }
-        .result-value.light-positive { color: #22C55E; }
-        .result-value.light-negative { color: #F87171; }
+        .result-value.negative {
+            color: #DC2626; /* Red, same as withdrawal button */
+        }
+        .result-value.light-positive {
+            color: #004225; /* Dark Green, same as positive */
+        }
+        .result-value.light-negative {
+            color: #DC2626; /* Red, same as negative */
+        }
 
         .message-box {
             margin-top: 1rem; padding: 0.75rem 1rem; border-radius: 0.375rem;
@@ -471,7 +478,7 @@
                 <span id="resultTotalWithdrawals" class="result-value"></span>
             </div>
             <div class="result-item">
-                <span class="result-label">Total Interest Earned:</span>
+                <span id="resultInterestLabel" class="result-label">Total Interest Earned:</span>
                 <span id="resultInterest" class="result-value"></span>
             </div>
             <hr class="my-2 border-gray-300">
@@ -702,6 +709,7 @@
         const toggleBreakdownBtn = document.getElementById('toggleBreakdownBtn');
         const resultsDiv = document.getElementById('results');
         const resultPrincipalSpan = document.getElementById('resultPrincipal');
+        const resultInterestLabel = document.getElementById('resultInterestLabel'); // Added ID to HTML
         const resultInterestSpan = document.getElementById('resultInterest');
         const resultTotalSpan = document.getElementById('resultTotal');
         const messageBox = document.getElementById('messageBox');
@@ -1020,30 +1028,52 @@
 
             // Display Results
             const formatCurrency = (value) => {
-                if (selectedCurrency === '¥' || selectedCurrency === '₩') { return `${selectedCurrency}${Math.round(value).toLocaleString()}`; }
-                const fixedValue = value.toFixed(2); const parts = fixedValue.split('.');
+                const absoluteValue = Math.abs(value); // Use absolute value for formatting, add sign later
+                if (selectedCurrency === '¥' || selectedCurrency === '₩') { return `${selectedCurrency}${Math.round(absoluteValue).toLocaleString()}`; }
+                const fixedValue = absoluteValue.toFixed(2);
+                const parts = fixedValue.split('.');
                 parts[0] = parseFloat(parts[0]).toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0});
                 return `${selectedCurrency}${parts.join('.')}`;
             };
 
             resultPrincipalSpan.textContent = formatCurrency(principal);
+
             resultTotalDepositsRow.style.display = (contributionChoice === 'deposits' || contributionChoice === 'both') && totalDepositsMade > 0 ? 'flex' : 'none';
             resultTotalDepositsSpan.textContent = formatCurrency(totalDepositsMade);
+
             resultTotalWithdrawalsRow.style.display = (contributionChoice === 'withdrawals' || contributionChoice === 'both') && totalWithdrawalsMade > 0 ? 'flex' : 'none';
             resultTotalWithdrawalsSpan.textContent = formatCurrency(totalWithdrawalsMade);
+            // Apply negative class for red color to withdrawals
+            if (totalWithdrawalsMade > 0) { // Withdrawals are positive amounts in terms of input, but represent money leaving
+                resultTotalWithdrawalsSpan.classList.add('negative');
+            } else {
+                resultTotalWithdrawalsSpan.classList.remove('negative');
+            }
 
-            resultInterestSpan.textContent = formatCurrency(totalInterestEarned);
-            resultInterestSpan.classList.remove('light-positive', 'light-negative');
-            if (totalInterestEarned >= 0) { resultInterestSpan.classList.add('light-positive'); } else { resultInterestSpan.classList.add('light-negative'); }
+
+            // Handle Total Interest Earned/Lost label and color
+            resultInterestSpan.classList.remove('light-positive', 'light-negative'); // Clear previous classes
+            if (totalInterestEarned < 0) {
+                resultInterestLabel.textContent = 'Total Interest Lost:';
+                resultInterestSpan.textContent = `-${formatCurrency(totalInterestEarned)}`; // Display with explicit negative sign
+                resultInterestSpan.classList.add('light-negative'); // Apply red color
+            } else {
+                resultInterestLabel.textContent = 'Total Interest Earned:';
+                resultInterestSpan.textContent = formatCurrency(totalInterestEarned);
+                resultInterestSpan.classList.add('light-positive'); // Apply green color
+            }
+
 
             resultTotalSpan.textContent = formatCurrency(futureValue);
-            resultTotalSpan.classList.remove('positive', 'negative');
-            if (futureValue >= 0) {
-                resultTotalSpan.classList.add('positive');
+            resultTotalSpan.classList.remove('positive', 'negative'); // Clear previous classes
+            if (futureValue < 0) {
+                resultTotalSpan.textContent = `-${formatCurrency(futureValue)}`; // Display with explicit negative sign
+                resultTotalSpan.classList.add('negative'); // Apply red color
             } else {
-                resultTotalSpan.classList.add('negative');
+                resultTotalSpan.textContent = formatCurrency(futureValue);
+                resultTotalSpan.classList.add('positive'); // Apply green color
             }
-            
+
             resultsDiv.style.display = 'block';
             toggleBreakdownBtn.style.display = 'block';
             showMessage('Calculation successful!', 'success');
@@ -1062,8 +1092,9 @@
             const selectedCurrency = currencySelect.value;
 
             const formatCurrencyForTable = (value) => {
-                if (selectedCurrency === '¥' || selectedCurrency === '₩') { return `${selectedCurrency}${Math.round(value).toLocaleString()}`; }
-                return `${selectedCurrency}${Number(value).toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})}`;
+                const absoluteValue = Math.abs(value);
+                if (selectedCurrency === '¥' || selectedCurrency === '₩') { return `${selectedCurrency}${Math.round(absoluteValue).toLocaleString()}`; }
+                return `${selectedCurrency}${Number(absoluteValue).toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})}`;
             };
 
             if (viewType === 'yearly') {
@@ -1116,20 +1147,41 @@
 
                 row.insertCell().textContent = periodDisplay;
                 row.insertCell().textContent = formatCurrencyForTable(item.startingBalance);
-                row.insertCell().textContent = formatCurrencyForTable(item.depositsThisPeriod);
-                row.insertCell().textContent = formatCurrencyForTable(item.withdrawalsThisPeriod);
-                row.insertCell().textContent = formatCurrencyForTable(item.interestEarnedThisPeriod);
+
+                const depositsCell = row.insertCell();
+                depositsCell.textContent = formatCurrencyForTable(item.depositsThisPeriod);
+                if (item.depositsThisPeriod > 0) { depositsCell.classList.add('positive'); } // Deposits are positive
+
+                const withdrawalsCell = row.insertCell();
+                withdrawalsCell.textContent = formatCurrencyForTable(item.withdrawalsThisPeriod);
+                if (item.withdrawalsThisPeriod > 0) { withdrawalsCell.classList.add('negative'); } // Withdrawals are negative impact
+
+                const interestCell = row.insertCell();
+                interestCell.textContent = formatCurrencyForTable(item.interestEarnedThisPeriod);
+                if (item.interestEarnedThisPeriod < 0) { interestCell.classList.add('light-negative'); }
+                else if (item.interestEarnedThisPeriod > 0) { interestCell.classList.add('light-positive'); }
+
 
                 const endBalanceCell = row.insertCell();
                 endBalanceCell.textContent = formatCurrencyForTable(item.endingBalance);
 
                 if (index === dataToRender.length - 1) {
                     row.classList.add('last-row-highlight');
-                    endBalanceCell.classList.remove('positive', 'negative');
-                    if (item.endingBalance >= 0) {
-                        endBalanceCell.classList.add('positive');
-                    } else {
+                    endBalanceCell.classList.remove('positive', 'negative'); // Clear existing classes
+                    if (item.endingBalance < 0) {
+                        endBalanceCell.textContent = `-${formatCurrencyForTable(item.endingBalance)}`; // Explicit negative sign
                         endBalanceCell.classList.add('negative');
+                    } else {
+                        endBalanceCell.classList.add('positive');
+                    }
+                } else {
+                    // For non-last rows, apply color based on positive/negative balance
+                    endBalanceCell.classList.remove('positive', 'negative');
+                    if (item.endingBalance < 0) {
+                        endBalanceCell.textContent = `-${formatCurrencyForTable(item.endingBalance)}`;
+                        endBalanceCell.classList.add('negative');
+                    } else {
+                        endBalanceCell.classList.add('positive');
                     }
                 }
             });
@@ -1147,9 +1199,12 @@
             resultsDiv.style.display = 'none';
             messageBox.style.display = 'none';
             messageBox.textContent = ''; messageBox.className = 'message-box';
-            resultTotalDepositsRow.style.display = 'none'; resultTotalWithdrawalsRow.style.display = 'none';
+            resultTotalDepositsRow.style.display = 'none';
+            resultTotalWithdrawalsRow.style.display = 'none';
             resultTotalSpan.classList.remove('positive', 'negative');
             resultInterestSpan.classList.remove('light-positive', 'light-negative');
+            resultTotalWithdrawalsSpan.classList.remove('negative'); // Clear color from withdrawals
+            resultInterestLabel.textContent = 'Total Interest Earned:'; // Reset label
 
             toggleBreakdownBtn.style.display = 'none';
             if (breakdownSection.style.display !== 'none') {
