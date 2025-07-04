@@ -559,7 +559,7 @@
             <h2>The Power of Compounding: Why Start Early?</h2>
             <p>The earlier you start investing, the more time compound interest has to work its magic. Even small, consistent contributions can grow into substantial sums over decades. This is due to the exponential nature of compounding.</p>
             <h3>Scenario Illustration:</h3>
-            <p>Consider two individuals, Anil and Bala, both investing ₹5,000 per month at an annual interest rate of 8%.</p>
+            <p>Consider two individuals, Anil and Bala, both investing ₹5,000 per month at an annual interest rate: 8%.</p>
             <ul>
                 <li><strong>Anil:</strong> Starts investing at age 25 and continues until age 60 (35 years).</li>
                 <li><strong>Bala:</strong> Starts investing at age 35 and continues until age 60 (25 years).</li>
@@ -709,7 +709,7 @@
         const toggleBreakdownBtn = document.getElementById('toggleBreakdownBtn');
         const resultsDiv = document.getElementById('results');
         const resultPrincipalSpan = document.getElementById('resultPrincipal');
-        const resultInterestLabel = document.getElementById('resultInterestLabel'); // Added ID to HTML
+        const resultInterestLabel = document.getElementById('resultInterestLabel');
         const resultInterestSpan = document.getElementById('resultInterest');
         const resultTotalSpan = document.getElementById('resultTotal');
         const messageBox = document.getElementById('messageBox');
@@ -997,19 +997,18 @@
                                 actualWithdrawalThisMonth = currentActualPeriodicWithdrawal;
                             }
                         }
-                        const amountToWithdraw = Math.min(currentBalance, actualWithdrawalThisMonth);
-                        currentBalance -= amountToWithdraw;
-                        totalWithdrawalsMade += amountToWithdraw;
-                        withdrawalsThisMonthTotal = amountToWithdraw;
+                        // FIX: Allow currentBalance to go negative if withdrawal exceeds current balance
+                        currentBalance -= actualWithdrawalThisMonth;
+                        totalWithdrawalsMade += actualWithdrawalThisMonth; // Accumulate the full requested withdrawal
+                        withdrawalsThisMonthTotal = actualWithdrawalThisMonth;
                     }
 
                     const balanceBeforeInterest = currentBalance;
+                    // Interest calculation should still apply even if balance is negative (debt accrual)
                     const monthlyGrowthFactor = Math.pow(1 + (annualRateDecimal / mainCompoundingFreqPerYear), mainCompoundingFreqPerYear / 12.0);
-                    let interestThisMonth = 0;
-                    if (currentBalance > 0) {
-                        currentBalance *= monthlyGrowthFactor;
-                        interestThisMonth = currentBalance - balanceBeforeInterest;
-                    }
+                    currentBalance *= monthlyGrowthFactor;
+                    let interestThisMonth = currentBalance - balanceBeforeInterest;
+
 
                     detailedBreakdownData.push({
                         periodType: 'Month',
@@ -1023,18 +1022,37 @@
                     });
                 }
                 futureValue = currentBalance;
+                // Recalculate totalInterestEarned based on final futureValue and total movements
                 totalInterestEarned = futureValue - principal - totalDepositsMade + totalWithdrawalsMade;
             }
 
             // Display Results
-            const formatCurrency = (value) => {
-                const absoluteValue = Math.abs(value); // Use absolute value for formatting, add sign later
-                if (selectedCurrency === '¥' || selectedCurrency === '₩') { return `${selectedCurrency}${Math.round(absoluteValue).toLocaleString()}`; }
-                const fixedValue = absoluteValue.toFixed(2);
-                const parts = fixedValue.split('.');
-                parts[0] = parseFloat(parts[0]).toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0});
-                return `${selectedCurrency}${parts.join('.')}`;
+            const formatCurrency = (value, includeSign = false) => {
+                const isNegative = value < 0;
+                const absoluteValue = Math.abs(value);
+                let formattedNumber;
+
+                if (selectedCurrency === '¥' || selectedCurrency === '₩') {
+                    formattedNumber = Math.round(absoluteValue).toLocaleString();
+                } else {
+                    formattedNumber = absoluteValue.toFixed(2);
+                    // Ensure proper thousands separator for non-yen/won currencies
+                    const parts = formattedNumber.split('.');
+                    parts[0] = parseFloat(parts[0]).toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0});
+                    formattedNumber = parts.join('.');
+                }
+
+                let finalString = `${selectedCurrency}${formattedNumber}`;
+
+                // Only prepend '-' if value is truly negative and includeSign is true, or if it's 0 and we want to show it as negative zero
+                if (isNegative && includeSign) {
+                    return `-${finalString}`;
+                } else if (value === 0) {
+                    return `${selectedCurrency}0.00`; // Always display 0.00 for zero
+                }
+                return finalString;
             };
+
 
             resultPrincipalSpan.textContent = formatCurrency(principal);
 
@@ -1043,8 +1061,8 @@
 
             resultTotalWithdrawalsRow.style.display = (contributionChoice === 'withdrawals' || contributionChoice === 'both') && totalWithdrawalsMade > 0 ? 'flex' : 'none';
             resultTotalWithdrawalsSpan.textContent = formatCurrency(totalWithdrawalsMade);
-            // Apply negative class for red color to withdrawals
-            if (totalWithdrawalsMade > 0) { // Withdrawals are positive amounts in terms of input, but represent money leaving
+            // Withdrawals are always red if displayed and totalWithdrawalsMade is a positive value
+            if (totalWithdrawalsMade > 0) { // Check the actual value, not just if the row is displayed
                 resultTotalWithdrawalsSpan.classList.add('negative');
             } else {
                 resultTotalWithdrawalsSpan.classList.remove('negative');
@@ -1052,26 +1070,30 @@
 
 
             // Handle Total Interest Earned/Lost label and color
-            resultInterestSpan.classList.remove('light-positive', 'light-negative'); // Clear previous classes
+            resultInterestSpan.classList.remove('light-positive', 'light-negative');
             if (totalInterestEarned < 0) {
                 resultInterestLabel.textContent = 'Total Interest Lost:';
-                resultInterestSpan.textContent = `-${formatCurrency(totalInterestEarned)}`; // Display with explicit negative sign
-                resultInterestSpan.classList.add('light-negative'); // Apply red color
+                resultInterestSpan.textContent = formatCurrency(totalInterestEarned, true); // Pass true to include sign
+                resultInterestSpan.classList.add('light-negative');
             } else {
                 resultInterestLabel.textContent = 'Total Interest Earned:';
-                resultInterestSpan.textContent = formatCurrency(totalInterestEarned);
-                resultInterestSpan.classList.add('light-positive'); // Apply green color
+                resultInterestSpan.textContent = formatCurrency(totalInterestEarned, false); // No explicit positive sign needed
+                resultInterestSpan.classList.add('light-positive');
             }
 
 
-            resultTotalSpan.textContent = formatCurrency(futureValue);
-            resultTotalSpan.classList.remove('positive', 'negative'); // Clear previous classes
-            if (futureValue < 0) {
-                resultTotalSpan.textContent = `-${formatCurrency(futureValue)}`; // Display with explicit negative sign
-                resultTotalSpan.classList.add('negative'); // Apply red color
-            } else {
-                resultTotalSpan.textContent = formatCurrency(futureValue);
-                resultTotalSpan.classList.add('positive'); // Apply green color
+            // Handle Future Value (resultTotalSpan)
+            resultTotalSpan.classList.remove('positive', 'negative');
+            if (futureValue < 0) { // If strictly negative
+                resultTotalSpan.textContent = formatCurrency(futureValue, true);
+                resultTotalSpan.classList.add('negative');
+            } else if (futureValue === 0 && principal > 0) { // If zero and started with principal > 0 (implies principal was depleted)
+                resultTotalSpan.textContent = formatCurrency(futureValue, false); // Display as 0.00
+                resultTotalSpan.classList.add('negative'); // Make it red as it's not a gain
+            }
+            else { // If positive
+                resultTotalSpan.textContent = formatCurrency(futureValue, false);
+                resultTotalSpan.classList.add('positive');
             }
 
             resultsDiv.style.display = 'block';
@@ -1091,10 +1113,28 @@
             const dataToRender = [];
             const selectedCurrency = currencySelect.value;
 
-            const formatCurrencyForTable = (value) => {
+            const formatCurrencyForTable = (value, includeSign = false) => {
+                const isNegative = value < 0;
                 const absoluteValue = Math.abs(value);
-                if (selectedCurrency === '¥' || selectedCurrency === '₩') { return `${selectedCurrency}${Math.round(absoluteValue).toLocaleString()}`; }
-                return `${selectedCurrency}${Number(absoluteValue).toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})}`;
+                let formattedNumber;
+
+                if (selectedCurrency === '¥' || selectedCurrency === '₩') {
+                    formattedNumber = Math.round(absoluteValue).toLocaleString();
+                } else {
+                    formattedNumber = absoluteValue.toFixed(2);
+                    const parts = formattedNumber.split('.');
+                    parts[0] = parseFloat(parts[0]).toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2});
+                    formattedNumber = parts.join('.');
+                }
+
+                let finalString = `${selectedCurrency}${formattedNumber}`;
+
+                if (isNegative && includeSign) {
+                    return `-${finalString}`;
+                } else if (value === 0) {
+                    return `${selectedCurrency}0.00`;
+                }
+                return finalString;
             };
 
             if (viewType === 'yearly') {
@@ -1146,43 +1186,32 @@
                 // This display should be fine as is.
 
                 row.insertCell().textContent = periodDisplay;
-                row.insertCell().textContent = formatCurrencyForTable(item.startingBalance);
+                row.insertCell().textContent = formatCurrencyForTable(item.startingBalance, false); // No sign for start balance
 
                 const depositsCell = row.insertCell();
-                depositsCell.textContent = formatCurrencyForTable(item.depositsThisPeriod);
-                if (item.depositsThisPeriod > 0) { depositsCell.classList.add('positive'); } // Deposits are positive
+                depositsCell.textContent = formatCurrencyForTable(item.depositsThisPeriod, false); // Deposits are positive amounts
+                if (item.depositsThisPeriod > 0) { depositsCell.classList.add('positive'); }
 
                 const withdrawalsCell = row.insertCell();
-                withdrawalsCell.textContent = formatCurrencyForTable(item.withdrawalsThisPeriod);
-                if (item.withdrawalsThisPeriod > 0) { withdrawalsCell.classList.add('negative'); } // Withdrawals are negative impact
+                withdrawalsCell.textContent = formatCurrencyForTable(item.withdrawalsThisPeriod, false); // Withdrawals are positive amounts in data, but negative impact
+                if (item.withdrawalsThisPeriod > 0) { withdrawalsCell.classList.add('negative'); }
 
                 const interestCell = row.insertCell();
-                interestCell.textContent = formatCurrencyForTable(item.interestEarnedThisPeriod);
+                interestCell.textContent = formatCurrencyForTable(item.interestEarnedThisPeriod, true); // Include sign for interest
                 if (item.interestEarnedThisPeriod < 0) { interestCell.classList.add('light-negative'); }
                 else if (item.interestEarnedThisPeriod > 0) { interestCell.classList.add('light-positive'); }
 
 
                 const endBalanceCell = row.insertCell();
-                endBalanceCell.textContent = formatCurrencyForTable(item.endingBalance);
-
-                if (index === dataToRender.length - 1) {
-                    row.classList.add('last-row-highlight');
-                    endBalanceCell.classList.remove('positive', 'negative'); // Clear existing classes
-                    if (item.endingBalance < 0) {
-                        endBalanceCell.textContent = `-${formatCurrencyForTable(item.endingBalance)}`; // Explicit negative sign
-                        endBalanceCell.classList.add('negative');
-                    } else {
-                        endBalanceCell.classList.add('positive');
-                    }
-                } else {
-                    // For non-last rows, apply color based on positive/negative balance
-                    endBalanceCell.classList.remove('positive', 'negative');
-                    if (item.endingBalance < 0) {
-                        endBalanceCell.textContent = `-${formatCurrencyForTable(item.endingBalance)}`;
-                        endBalanceCell.classList.add('negative');
-                    } else {
-                        endBalanceCell.classList.add('positive');
-                    }
+                endBalanceCell.textContent = formatCurrencyForTable(item.endingBalance, true); // Include sign for end balance
+                endBalanceCell.classList.remove('positive', 'negative'); // Clear existing classes
+                if (item.endingBalance < 0) {
+                    endBalanceCell.classList.add('negative');
+                } else if (item.endingBalance === 0 && principal > 0) { // If zero and principal was positive
+                    endBalanceCell.classList.add('negative');
+                }
+                else {
+                    endBalanceCell.classList.add('positive');
                 }
             });
         }
