@@ -356,6 +356,21 @@
         #faqs dd {
             margin-bottom: 1.5rem; /* This creates space AFTER each Q&A pair */
         }
+
+        /* New CSS for H1 tab container */
+        .h1-tab-container {
+            background-color: #004225; /* British Racing Green */
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 0.75rem; /* Rounded corners */
+            text-align: center;
+            margin-bottom: 2rem; /* Space below the tab */
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        .h1-tab-container h1 {
+            margin: 0; /* Remove default h1 margins inside the tab */
+            color: white; /* Ensure text is white */
+        }
     </style>
 </head>
 <body class="bg-gray-100">
@@ -379,7 +394,10 @@
     </div>
 
     <div class="calculator-container">
-        <h1 class="text-2xl font-bold text-center text-gray-800 mb-8">Compound Interest Calculator</h1>
+        <!-- H1 wrapped in a new div for the tab effect -->
+        <div class="h1-tab-container">
+            <h1 class="text-2xl font-bold">Compound Interest Calculator</h1>
+        </div>
 
         <div class="input-group">
             <label for="currency" class="input-label">Currency</label>
