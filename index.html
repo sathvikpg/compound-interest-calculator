@@ -351,6 +351,11 @@
             margin-bottom: 1rem;
             color: #1F2937;
         }
+
+        /* Corrected CSS for FAQ spacing: Increased margin-bottom for dd */
+        #faqs dd {
+            margin-bottom: 1.5rem; /* This creates space AFTER each Q&A pair */
+        }
     </style>
 </head>
 <body class="bg-gray-100">
@@ -387,7 +392,7 @@
                 <option value="C$" data-label="CAD (C$)">Canadian Dollar (C$)</option>
                 <option value="Fr" data-label="CHF (Fr)">Swiss Franc (Fr)</option>
                 <option value="₹" data-label="INR (₹)" selected>Indian Rupee (₹)</option>
-                <option value="R$" data-label="BRL (R$)">Brazilian Real (R$)</option>
+                <option value="R$" data-label="BRL (R$)">Brazilian Real (R$))</option>
                 <option value="₽" data-label="RUB (₽)">Russian Ruble (₽)</option>
                 <option value="元" data-label="CNY (元)">Chinese Yuan (元)</option>
                 <option value="₩" data-label="KRW (₩)">South Korean Won (₩)</option>
@@ -565,7 +570,7 @@
                 <li>n = the number of times that interest is compounded per year</li>
                 <li>t = the number of years the money is invested or borrowed for</li>
             </ul>
-            <h3>Let's illustrate with an example:</h3>
+            <h3>Scenario Illustration:</h3>
             <p>Imagine you invest ₹10,000 at an annual interest rate of 5%, compounded annually for 3 years.</p>
             <ul>
                 <li><strong>Year 1:</strong></li>
@@ -603,14 +608,6 @@
         <div id="typesOfCompoundingFrequencies" class="content-section">
             <h2>Types of Compounding Frequencies and Their Impact</h2>
             <p>The frequency of compounding refers to how often the earned interest is added back to the principal. The more frequently interest is compounded, the faster your money grows, as you start earning interest on your interest sooner.</p>
-            <p>Common compounding frequencies include:</p>
-            <ul>
-                <li><strong>Annually (n=1):</b> Interest is calculated and added once a year.</li>
-                <li><strong>Semi-annually (n=2):</strong> Interest is calculated and added twice a year.</li>
-                <li><strong>Quarterly (n=4):</b> Interest is calculated and added four times a year.</li>
-                <li><strong>Monthly (n=12):</strong> Interest is calculated and added twelve times a year.</li>
-                <li><strong>Daily (n=365):</strong> Interest is calculated and added every day.</li>
-            </ul>
             <h3>Impact on Returns:</h3>
             <p>Let's use our ₹10,000 example at 5% for 3 years:</p>
             <ul>
@@ -652,7 +649,7 @@
 
         <div id="savingForRetirement" class="content-section">
             <h2>Saving for Retirement with Compound Interest</h2>
-            <p>Saving for retirement is one of the most crucial applications of compound interest. Here's practical advice:</p>
+            <h3>Practical Advice for Retirement Savings:</h3>
             <ul>
                 <li><strong>Start Early:</strong> As discussed, time is your biggest asset with compounding. Begin contributing to your retirement savings as soon as possible, even if it's a small amount.</li>
                 <li><strong>Be Consistent:</strong> Regular contributions, even modest ones, add up significantly over time. Automate your savings to ensure you contribute consistently.</li>
@@ -667,7 +664,7 @@
 
         <div id="investingStrategies" class="content-section">
             <h2>Investing Strategies Leveraging Compounding</h2>
-            <p>Compounding is a core principle behind various investment vehicles. Here are some where it plays a significant role:</p>
+            <h3>Common Investment Vehicles:</h3>
             <ul>
                 <li><strong>Equity Mutual Funds/Stocks:</strong> When you invest in equities, your returns come from capital appreciation (the stock price increasing) and dividends. Reinvesting dividends allows them to buy more shares, which then generate more dividends, leading to compounding growth. Mutual funds pool money from many investors and invest in a diversified portfolio of stocks, and their returns also compound over time.</li>
                 <li><strong>Fixed Deposits (FDs) / Recurring Deposits (RDs):</strong> While offering lower returns than equities, FDs and RDs allow you to earn compound interest. If you choose the reinvestment option, the interest earned is added to the principal, and subsequent interest is calculated on this larger amount.</li>
@@ -675,12 +672,15 @@
                 <li><strong>Bonds:</strong> Some bonds pay interest semi-annually or annually. If you reinvest this interest, you're leveraging compounding.</li>
                 <li><strong>Savings Accounts:</strong> Most savings accounts offer compound interest, though usually at a very low rate, often compounded daily or monthly. While not a high-growth investment, the principle of compounding still applies.</li>
             </ul>
-            <p><strong>Key Strategy:</strong> The common thread among these is the concept of <strong>reinvestment</strong>. To truly leverage compounding, always strive to reinvest any earnings back into your investment.</p>
+            <h3>Key Strategy:</h3>
+            <p>The common thread among these is the concept of <strong>reinvestment</strong>. To truly leverage compounding, always strive to reinvest any earnings back into your investment.</p>
         </div>
 
         <div id="inflationAndRealReturns" class="content-section">
             <h2>Understanding Inflation and Real Returns</h2>
+            <h3>What is Inflation?</h3>
             <p>While compound interest helps your money grow, inflation can erode its purchasing power. Inflation is the rate at which the general level of prices for goods and services is rising, and consequently, the purchasing power of currency is falling.</p>
+            <h3>Nominal vs. Real Return:</h3>
             <ul>
                 <li><strong>Nominal Return:</strong> The stated return on your investment <em>before</em> accounting for inflation. This is what your compound interest calculator will show.</li>
                 <li><strong>Real Return:</strong> The return on your investment <em>after</em> accounting for inflation. This indicates the actual increase in your purchasing power.</li>
